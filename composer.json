@@ -1,6 +1,6 @@
 {
     "require": {
         "slim/slim": "^2.6",
-	"gabordemooij/redbean": "dev-master"
+        "propel/propel": "~2.0@dev"
     }
 }
