@@ -1,0 +1,61 @@
+<database name="default" defaultIdMethod="native"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
+          namespace="Undercity"
+        >
+    <table name="images" phpName="Images">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="source" type="varchar" size="255" required="true" />
+        <column name="source_thumb" type="varchar" size="255" required="true" />
+    </table>
+    <table name="book" phpName="Book">
+        <!--
+            Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
+            the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
+
+            Each column also requires a `type`. The XML schema is database agnostic, so the column types and attributes
+            are probably not exactly the same as the one you use in your own database. But Propel knows how to map the
+            schema types with SQL types for many database vendors. Existing Propel column types are:
+            `boolean`, `tinyint`, `smallint`, `integer`, `bigint`, `double`, `float`, `real`, `decimal`, `char`,
+            `varchar`, `longvarchar`, `date`, `time`, `timestamp`, `blob`, `clob`, `object`, and `array`.
+
+            Some column types use a size (like `varchar` and `int`), some have unlimited size (`longvarchar`, `clob`,
+            `blob`).
+
+            Check the (schema reference)[http://propelorm.org/reference/schema.html] for more details
+            on each column type.
+
+            As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
+            what their names imply.
+        -->
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="title" type="varchar" size="255" required="true"/>
+        <column name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
+        <column name="publisher_id" type="integer" required="true"/>
+        <column name="author_id" type="integer" required="true"/>
+
+        <!--
+            A foreign key represents a relationship. Just like a table or a column, a relationship has a `phpName`.
+            By default, Propel uses the `phpName` of the foreign table as the `phpName` of the relation.
+
+            The `refPhpName` defines the name of the relation as seen from the foreign table.
+        -->
+        <foreign-key foreignTable="publisher" phpName="Publisher" refPhpName="Book">
+            <reference local="publisher_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="author">
+            <reference local="author_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="author" phpName="Author">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="first_name" type="varchar" size="128" required="true"/>
+        <column name="last_name" type="varchar" size="128" required="true"/>
+    </table>
+
+    <table name="publisher" phpName="Publisher">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="128" required="true"/>
+    </table>
+</database>

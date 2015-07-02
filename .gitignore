@@ -1,0 +1,10 @@
+/bower_components/
+/node_modules/
+/composer.lock
+/propel.xml
+/generated-sql/
+/models/Undercity/Base/
+/models/Undercity/Map/
+/config/config.php
+/vendor/
+/resources/
