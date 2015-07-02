@@ -3,7 +3,7 @@
 require_once 'vendor/autoload.php';
 
 // setup Propel
-require_once '/config/config.php';
+require_once 'config/config.php';
 
 define('RESOURCE_PATH', 'resources/');
 
@@ -47,7 +47,7 @@ $app->group('/images', function () use ($app) {
 
             if (file_exists($fileName))
             {
-                unlink($filename);
+                unlink($fileName);
             }
 
             $image->delete();

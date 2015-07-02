@@ -4,7 +4,7 @@ Undercity for Sylvanas
 Undercity provides services for [Sylvanas](https://github.com/redspy/Sylvanas). it is developed using php. database is mysql.
 
 copy propel.xml.dist to propel.xml
-change DB configuration
+change DB configuration & path where Propel expects to find schema.xml & path where Propel should generate models in propel.xml
 
 $ composer install
 $ ./vendor/bin/propel sql:build
