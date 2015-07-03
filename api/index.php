@@ -9,6 +9,12 @@ define('RESOURCE_PATH', 'resources/');
 
 $app = new \Slim\Slim();
 
+$app->group('/banners', function () use ($app) {
+    $app->get('/', function () use ($app) {
+
+    });
+});
+
 $app->group('/images', function () use ($app) {
     $app->get('/:id', function($id) use ($app) {
         $image = \Undercity\ImagesQuery::create()->findPK($id);
@@ -32,11 +38,41 @@ $app->group('/images', function () use ($app) {
         }
     });
 
-    $app->post('/', function ($id) use ($app) {
-        $image = new \Undercity\Images();
-        $image->setSource('aurora_blue.jpg');
-        $image->setSourceThumb('aurora_blue.jpg');
-        $image->save();
+    $app->post('/', function () use ($app) {
+        if (array_key_exists('image', $_FILES)) {
+            if (!is_dir(RESOURCE_PATH)) {
+                mkdir(RESOURCE_PATH);
+            }
+
+            $file = $_FILES['image'];
+
+            $filename = uniqid() . '.' . pathinfo($file['name'])['extension'];
+
+            if (is_uploaded_file($file['tmp_name'])) {
+                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $filename);
+
+                $image = new \Undercity\Images();
+                $image->setSource($filename);
+                $image->setSourceThumb($filename);
+                $image->save();
+
+                $app->response->headers->set('Content-Type', 'application/json');
+
+                $response = array(
+                    'image' => $image->getId()
+                );
+
+                echo json_encode($response);
+            }
+        }
+        else {
+            $app->response->setStatus(404);
+        }
+    });
+    
+    $app->put('/:id', function ($id) use ($app) {
+        echo array_key_exists('image', $_FILES);
+        var_dump($_FILES);
     });
 
     $app->delete('/:id', function ($id) use ($app) {
