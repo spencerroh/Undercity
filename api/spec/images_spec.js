@@ -6,20 +6,27 @@ var FormData = require('form-data');
 
 var API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 
-var form = new FormData();
-var testImagePath = path.resolve(__dirname, 'resources/test.png');
+var formForCreate = new FormData();
+var formForUpdate = new FormData();
 
-form.append('image', fs.createReadStream(testImagePath), {
-    knownLength: fs.statSync(testImagePath).size
+var testPngPath = path.resolve(__dirname, 'resources/test.png');
+var testJpgPath = path.resolve(__dirname, 'resources/test.jpg');
+
+formForCreate.append('image', fs.createReadStream(testPngPath), {
+    knownLength: fs.statSync(testPngPath).size
+});
+
+formForUpdate.append('image', fs.createReadStream(testJpgPath), {
+    knownLength: fs.statSync(testJpgPath).size
 });
 
 
 frisby.create('Update a image and get a id of image')
-    .post(API_ENDPOINT, form, {
+    .post(API_ENDPOINT, formForCreate, {
         json: false,
         headers: {
-            'content-type': 'multipart/form-data; boundary=' + form.getBoundary(),
-            'content-length': form.getLengthSync()
+            'content-type': 'multipart/form-data; boundary=' + formForCreate.getBoundary(),
+            'content-length': formForCreate.getLengthSync()
         }
     })
     .expectStatus(200)
@@ -37,16 +44,22 @@ frisby.create('Update a image and get a id of image')
             .toss();
     
         frisby.create('Modify a image')
-            .put(API_ENDPOINT + imageKey, form, {
+            .post(API_ENDPOINT + imageKey, formForUpdate, {
                 json: false,
                 headers: {
-                    'content-type': 'multipart/form-data; boundary=' + form.getBoundary(),
-                    'content-length': form.getLengthSync()
+                    'content-type': 'multipart/form-data; boundary=' + formForUpdate.getBoundary(),
+                    'content-length': formForUpdate.getLengthSync()
                 }
             })
             .expectStatus(200)
             .toss();
-/*
+
+        frisby.create('Check image is modified')
+            .get(API_ENDPOINT + imageKey)
+            .expectStatus(200)
+            .expectHeaderContains('content-type', 'image/jpeg')
+            .toss();
+
         frisby.create('Delete a image')
             .delete(API_ENDPOINT + imageKey)
             .expectStatus(200)
@@ -57,6 +70,5 @@ frisby.create('Update a image and get a id of image')
                     .toss();
             })
             .toss();
-            */
     })
     .toss();

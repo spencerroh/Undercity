@@ -17,7 +17,7 @@ $app->group('/banners', function () use ($app) {
 
 $app->group('/images', function () use ($app) {
     $app->get('/:id', function($id) use ($app) {
-        $image = \Undercity\ImagesQuery::create()->findPK($id);
+        $image = \Undercity\ImageQuery::create()->findPK($id);
 
         if ($image != NULL) {
             $fileName = RESOURCE_PATH.$image->getSource();
@@ -38,6 +38,39 @@ $app->group('/images', function () use ($app) {
         }
     });
 
+    $app->post('/:id', function ($id) use ($app) {
+        $image = \Undercity\ImageQuery::create()->findPK($id);
+
+        if ($image != NULL) {
+            $file = $_FILES['image'];
+            $fileName = uniqid() . '.' . pathinfo($file['name'])['extension'];
+
+            if (is_uploaded_file($file['tmp_name'])) {
+                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $fileName);
+
+                $oldFileName = RESOURCE_PATH.$image->getSource();
+
+                if (file_exists($oldFileName))
+                {
+                    unlink($oldFileName);
+                }
+
+                $image->setSource($fileName);
+                $image->save();
+
+                $app->response->headers->set('Content-Type', 'application/json');
+
+                $response = array(
+                    'image' => $image->getId()
+                );
+
+                echo json_encode($response);
+            }
+        } else {
+            $app->response->setStatus(404);
+        }
+    });
+
     $app->post('/', function () use ($app) {
         if (array_key_exists('image', $_FILES)) {
             if (!is_dir(RESOURCE_PATH)) {
@@ -45,13 +78,12 @@ $app->group('/images', function () use ($app) {
             }
 
             $file = $_FILES['image'];
-
             $filename = uniqid() . '.' . pathinfo($file['name'])['extension'];
 
             if (is_uploaded_file($file['tmp_name'])) {
                 move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $filename);
 
-                $image = new \Undercity\Images();
+                $image = new \Undercity\Image();
                 $image->setSource($filename);
                 $image->setSourceThumb($filename);
                 $image->save();
@@ -70,13 +102,8 @@ $app->group('/images', function () use ($app) {
         }
     });
     
-    $app->put('/:id', function ($id) use ($app) {
-        echo array_key_exists('image', $_FILES);
-        var_dump($_FILES);
-    });
-
     $app->delete('/:id', function ($id) use ($app) {
-        $image = \Undercity\ImagesQuery::create()->findPK($id);
+        $image = \Undercity\ImageQuery::create()->findPK($id);
 
         if ($image != NULL) {
             $fileName = RESOURCE_PATH.$image->getSource();

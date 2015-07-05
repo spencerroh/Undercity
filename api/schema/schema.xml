@@ -3,12 +3,12 @@
           xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
           namespace="Undercity"
         >
-    <table name="images" phpName="Images">
+    <table name="images" phpName="Image">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="source" type="varchar" size="255" required="true" />
         <column name="source_thumb" type="varchar" size="255" required="true" />
     </table>
-    <table name="book" phpName="Book">
+    <table name="banners" phpName="Banner">
         <!--
             Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
             the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
@@ -29,33 +29,17 @@
             what their names imply.
         -->
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="title" type="varchar" size="255" required="true"/>
-        <column name="isbn" type="varchar" size="24" required="true" phpName="ISBN"/>
-        <column name="publisher_id" type="integer" required="true"/>
-        <column name="author_id" type="integer" required="true"/>
-
+        <column name="contactType" type="integer" required="true"/>
+        <column name="contact" type="varchar" size="255" reqired="true"/>
+        <column name="image_id" type="integer" required="true"/>
         <!--
             A foreign key represents a relationship. Just like a table or a column, a relationship has a `phpName`.
             By default, Propel uses the `phpName` of the foreign table as the `phpName` of the relation.
 
             The `refPhpName` defines the name of the relation as seen from the foreign table.
         -->
-        <foreign-key foreignTable="publisher" phpName="Publisher" refPhpName="Book">
-            <reference local="publisher_id" foreign="id"/>
+        <foreign-key foreignTable="images" phpName="Image" refPhpName="Banner">
+            <reference local="image_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="author">
-            <reference local="author_id" foreign="id"/>
-        </foreign-key>
-    </table>
-
-    <table name="author" phpName="Author">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="first_name" type="varchar" size="128" required="true"/>
-        <column name="last_name" type="varchar" size="128" required="true"/>
-    </table>
-
-    <table name="publisher" phpName="Publisher">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="name" type="varchar" size="128" required="true"/>
     </table>
 </database>
