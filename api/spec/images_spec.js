@@ -6,16 +6,15 @@ var FormData = require('form-data');
 
 var API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 
-var formForCreate = new FormData();
-var formForUpdate = new FormData();
-
 var testPngPath = path.resolve(__dirname, 'resources/test.png');
 var testJpgPath = path.resolve(__dirname, 'resources/test.jpg');
 
+var formForCreate = new FormData();
 formForCreate.append('image', fs.createReadStream(testPngPath), {
     knownLength: fs.statSync(testPngPath).size
 });
 
+var formForUpdate = new FormData();
 formForUpdate.append('image', fs.createReadStream(testJpgPath), {
     knownLength: fs.statSync(testJpgPath).size
 });

@@ -29,7 +29,7 @@
             what their names imply.
         -->
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="contactType" type="integer" required="true"/>
+        <column name="contact_type" type="integer" required="true"/>
         <column name="contact" type="varchar" size="255" reqired="true"/>
         <column name="image_id" type="integer" required="true"/>
         <!--

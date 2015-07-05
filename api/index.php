@@ -10,8 +10,37 @@ define('RESOURCE_PATH', 'resources/');
 $app = new \Slim\Slim();
 
 $app->group('/banners', function () use ($app) {
-    $app->get('/', function () use ($app) {
+    $app->post('/', function ()  use ($app) {
+        $banner = new \Undercity\Banner();
 
+        $request = $app->request()->post();
+
+        if (array_key_exists('contact', $request) &&
+            array_key_exists('contact_type', $request) &&
+            array_key_exists('image_id', $request)) {
+
+            $image = \Undercity\ImageQuery::create()->findPK($request['image_id']);
+
+            if ($image != NULL) {
+                $banner->setContact($request['contact']);
+                $banner->setContactType($request['contact_type']);
+                $banner->setImage($image);
+
+                $banner->save();
+
+                echo $banner->exportTo('JSON');
+            } else {
+                $app->response->setStatus(404);
+            }
+
+        } else {
+            $app->response->setStatus(400);
+        }
+    });
+
+    $app->get('/', function () use ($app) {
+        $banners = \Undercity\BannerQuery::create()->find();
+        echo ($banners->toJSON())['Banners'];
     });
 });
 
