@@ -15,8 +15,12 @@ formForImage.append('image', fs.createReadStream(testPngPath), {
 });
 
 var formForBannerCreation = new FormData();
-formForBannerCreation.append('contact_type', '0');   // 0: URL, 1: Phone
-formForBannerCreation.append('contact', 'http://www.google.co.kr');
+formForBannerCreation.append('ContactType', '0');   // 0: URL, 1: Phone
+formForBannerCreation.append('Contact', 'http://www.google.co.kr');
+
+var formForBannerUpdate = new FormData();
+formForBannerUpdate.append('ContactType', '1');   // 0: URL, 1: Phone
+formForBannerUpdate.append('Contact', '010-1234-5678');
 
 
 frisby.create('Create a banner')
@@ -30,7 +34,7 @@ frisby.create('Create a banner')
     .expectStatus(200)
     .afterJSON(function (json) {
         var imageKey = json.image;
-        formForBannerCreation.append('image_id', imageKey);
+        formForBannerCreation.append('ImageId', imageKey);
 
         frisby.create('Create a banner object')
             .post(BANNERS_API_ENDPOINT, formForBannerCreation, {
@@ -44,14 +48,49 @@ frisby.create('Create a banner')
             .expectJSONTypes({
                 Id: Number,
                 ContactType: Number,
-                Contact: String
+                Contact: String,
+                ImageId: Number
             })
             .expectJSON({
                 ContactType: 0,
                 Contact: 'http://www.google.co.kr'
             })
             .afterJSON(function (json) {
+                frisby.create('Get a banner')
+                    .get(BANNERS_API_ENDPOINT + json.Id)
+                    .expectStatus(200)
+                    .toss();
 
+                frisby.create('Modify a banner')
+                    .post(BANNERS_API_ENDPOINT + json.Id, formForBannerUpdate, {
+                        json: false,
+                        headers: {
+                            'content-type': 'multipart/form-data; boundary=' + formForBannerUpdate.getBoundary(),
+                            'content-length': formForBannerUpdate.getLengthSync()
+                        }
+                    })
+                    .expectStatus(200)
+                    .expectJSONTypes({
+                        Id: Number,
+                        ContactType: Number,
+                        Contact: String,
+                        ImageId: Number
+                    })
+                    .expectJSON({
+                        ContactType: 1,
+                        Contact: '010-1234-5678'
+                    })
+                    .toss();
+
+                frisby.create('Delete a banner')
+                    .delete(BANNERS_API_ENDPOINT + json.Id)
+                    .expectStatus(200)
+                    .toss();
+
+                frisby.create('Check banner is deleted')
+                    .get(BANNERS_API_ENDPOINT + json.Id)
+                    .expectStatus(404)
+                    .toss();
             })
             .toss();
     })

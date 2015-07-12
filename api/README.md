@@ -20,3 +20,17 @@ Run these command line to initialize external libraries and generate database mo
     
     
     $ npm install -g jasmine-node   
+    
+    
+###API###
+GET undercity/api/images/:id
+
+POST undercity/api/images
+
+response
+format: json
+image: number
+
+POST undercity/api/images/:id
+
+DELETE undercity/api/images/:id
