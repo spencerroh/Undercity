@@ -16,6 +16,9 @@
                     <password></password>
                     <settings>
                         <charset>utf8</charset>
+                        <queries>
+                            <utf8>SET NAMES utf8 COLLATE utf8_unicode_ci, COLLATION_CONNECTION = utf8_unicode_ci, COLLATION_DATABASE = utf8_unicode_ci, COLLATION_SERVER = utf8_unicode_ci</utf8>
+                        </queries>
                     </settings>
                 </connection>
             </connections>

@@ -10,3 +10,4 @@ vendor
 /api/resources/
 /api/propel.xml
 /api/vendor/
+.idea
