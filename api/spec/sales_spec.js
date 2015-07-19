@@ -94,5 +94,9 @@ frisby.create('Create a Sales Event with full information')
             .delete(SALES_API_ENDPOINT + json.Id)
             .expectStatus(200)
             .toss();
+
+        frisby.create('Check test sales event is deleted')
+            .get(SALES_API_ENDPOINT + json.Id)
+            .expectStatus(404)
     })
     .toss();
