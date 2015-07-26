@@ -7,210 +7,14 @@ require_once 'config/config.php';
 
 define('RESOURCE_PATH', 'resources/');
 
+date_default_timezone_set('asia/seoul');
+
 $app = new \Slim\Slim();
 
-$app->group('/images', function () use ($app) {
-    $app->get('/:id', function ($id) use ($app) {
-        $image = \Undercity\ImageQuery::create()->findPK($id);
-
-        if ($image != NULL) {
-            $fileName = RESOURCE_PATH . $image->getSource();
-            $mimeType = mime_content_type($fileName);
-            if (file_exists($fileName) &&
-                strpos($mimeType, 'image') !== false
-            ) {
-                $app->response->headers->set('Content-Type', $mimeType);
-                $app->response->headers->set('Content-Length', filesize($fileName));
-
-                fpassthru(fopen($fileName, 'rb'));
-            } else {
-                $image->delete();
-                $app->response->setStatus(404);
-            }
-
-        } else {
-            $app->response->setStatus(404);
-        }
-    });
-
-    $app->post('/:id', function ($id) use ($app) {
-        $image = \Undercity\ImageQuery::create()->findPK($id);
-
-        if ($image != NULL) {
-            $file = $_FILES['image'];
-            $fileName = uniqid() . '.' . pathinfo($file['name'])['extension'];
-
-            if (is_uploaded_file($file['tmp_name'])) {
-                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $fileName);
-
-                $oldFileName = RESOURCE_PATH . $image->getSource();
-
-                if (file_exists($oldFileName)) {
-                    unlink($oldFileName);
-                }
-
-                $image->setSource($fileName);
-                $image->save();
-
-                $app->response->headers->set('Content-Type', 'application/json');
-
-                $response = array(
-                    'image' => $image->getId()
-                );
-
-                echo json_encode($response);
-            }
-        } else {
-            $app->response->setStatus(404);
-        }
-    });
-
-    $app->post('/', function () use ($app) {
-        if (array_key_exists('image', $_FILES)) {
-            if (!is_dir(RESOURCE_PATH)) {
-                mkdir(RESOURCE_PATH);
-            }
-
-            $file = $_FILES['image'];
-            $filename = uniqid() . '.' . pathinfo($file['name'])['extension'];
-
-            if (is_uploaded_file($file['tmp_name'])) {
-                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $filename);
-
-                $image = new \Undercity\Image();
-                $image->setSource($filename);
-                $image->setSourceThumb($filename);
-                $image->save();
-
-                $app->response->headers->set('Content-Type', 'application/json');
-
-                $response = array(
-                    'image' => $image->getId()
-                );
-
-                echo json_encode($response);
-            }
-        } else {
-            $app->response->setStatus(404);
-        }
-    });
-
-    $app->delete('/:id', function ($id) use ($app) {
-        $image = \Undercity\ImageQuery::create()->findPK($id);
-        echo '1';
-        if ($image != NULL) {
-            $image->delete();
-        } else {
-            $app->response->setStatus(404);
-        }
-    });
-});
-
-$app->group('/banners', function () use ($app) {
-    $app->post('/', function () use ($app) {
-        $banner = new \Undercity\Banner();
-
-        $request = $app->request()->post();
-
-        if (array_key_exists('Contact', $request) &&
-            array_key_exists('ContactType', $request) &&
-            array_key_exists('ImageId', $request)
-        ) {
-            $image = \Undercity\ImageQuery::create()->findPK($request['ImageId']);
-
-            if ($image != NULL) {
-                $banner->setContact($request['Contact']);
-                $banner->setContactType($request['ContactType']);
-                $banner->setImage($image);
-
-                $banner->save();
-
-                echo $banner->exportTo('JSON');
-            } else {
-                $app->response->setStatus(404);
-            }
-
-        } else {
-            $app->response->setStatus(400);
-        }
-    });
-
-    $app->get('/', function () use ($app) {
-        $banners = \Undercity\BannerQuery::create()->find();
-        echo json_encode($banners->toArray());
-    });
-
-    $app->get('/:id', function ($id) use ($app) {
-        $banner = \Undercity\BannerQuery::create()->findPK($id);
-
-        if ($banner != null) {
-            echo json_encode($banner->toArray());
-        } else {
-            $app->response->setStatus(404);
-        }
-    });
-
-    $app->post('/:id', function ($id) use ($app) {
-        $request = $app->request()->post();
-
-        $banner = \Undercity\BannerQuery::create()->findPK($id);
-        $oldImage = null;
-
-        if ($banner != null) {
-            if (array_key_exists('ImageId', $request)) {
-                $newImage = \Undercity\ImageQuery::create()->findPK($request['ImageId']);
-                if ($newImage != null) {
-                    $oldImage = $banner->getImage();
-                    $banner->setImage($newImage);
-                } else {
-                    $app->response->setStatus(404);
-                    return;
-                }
-
-
-                if ($oldImage != null) {
-                    $oldImage->delete();
-                }
-            }
-
-            if (array_key_exists('Contact', $request)) {
-                $banner->setContact($request['Contact']);
-            }
-
-            if (array_key_exists('ContactType', $request)) {
-                $banner->setContactType($request['ContactType']);
-            }
-
-            $banner->save();
-
-            if ($oldImage != null) {
-                $oldImage->delete();
-            }
-
-            echo json_encode($banner->toArray());
-
-        } else {
-            $app->response->setStatus(400);
-        }
-    });
-
-    $app->delete('/:id', function ($id) use ($app) {
-        $banner = \Undercity\BannerQuery::create()->findPK($id);
-
-        if ($banner != null) {
-            $image = \Undercity\ImageQuery::create()->findPK($banner->getImageId());
-
-            $banner->delete();
-
-            if ($image != null) {
-                $image->delete();
-            }
-        } else {
-            $app->response->setStatus(404);
-        }
-
-    });
-});
+$routeFiles = (array) glob('routes/*.php');
+foreach($routeFiles as $routeFile) {
+    require $routeFile;
+}
 
 $app->group('/store', function () use ($app) {
     $app->get('/:from/:count', function ($from, $count) use ($app) {
@@ -278,9 +82,38 @@ $app->group('/sales', function () use ($app) {
             $sale->setCreateDate(new DateTime('now'), new DateTimeZone('Asia/Seoul'));
             $sale->save();
 
-            $app->response->headers->set('Content-Type', 'application/json');
-            echo $sale->exportTo('JSON');
+            if (array_key_exists('Images', $request) &&
+                is_array($request['Images'])) {
+                $images = $request['Images'];
 
+                foreach ($images as $imgKey) {
+                    $image = \Undercity\ImageQuery::create()->findPk($imgKey);
+                    if ($image != null) {
+                        $saleImage = new \Undercity\SaleImages();
+                        $saleImage->setImage($image);
+                        $saleImage->setSale($sale);
+                        $saleImage->save();
+                    }
+                }
+            }
+
+            $app->response->headers->set('Content-Type', 'application/json');
+
+            $response = $sale->toArray();
+
+            $saleImages = \Undercity\SaleImagesQuery::create()->findBySaleId($sale->getId());
+            $images = array();
+
+            if ($saleImages != null) {
+                foreach ($saleImages as $s) {
+                    array_push($images, $s->getImageId());
+                }
+            }
+            $response['Images'] = $images;
+
+            $app->response->headers->set('Content-Type', 'application/json');
+
+            echo json_encode($response);
         } else {
             $app->response->setStatus(400);
         }
@@ -326,7 +159,7 @@ $app->group('/sales', function () use ($app) {
             ) {
                 $sale->setGPS($request['GPS']);
             }
-            $sale->setCreateDate(new DateTime('now'));
+
             $sale->save();
 
             $app->response->headers->set('Content-Type', 'application/json');
@@ -342,8 +175,20 @@ $app->group('/sales', function () use ($app) {
             ->findPk($id);
 
         if ($sale != null) {
+            $response = $sale->toArray();
+
+            $saleImages = \Undercity\SaleImagesQuery::create()->findBySaleId($sale->getId());
+            $images = array();
+            if ($saleImages != null) {
+                foreach ($saleImages as $saleImage) {
+                    array_push($images, $saleImage->getImageId());
+                }
+            }
+            $response['Images'] = $images;
+
             $app->response->headers->set('Content-Type', 'application/json');
-            echo $sale->exportTo('JSON');
+
+            echo json_encode($response);
         } else {
             $app->response->setStatus(404);
         }
@@ -354,10 +199,90 @@ $app->group('/sales', function () use ($app) {
             ->findPk($id);
 
         if ($sale != null) {
+            $saleImages = \Undercity\SaleImagesQuery::create()->findBySaleId($sale->getId());
+            foreach ($saleImages as $saleImage) {
+                $saleImage = \Undercity\SaleImagesQuery::create()->findOneByImageId($id);
+                $saleImage->delete();
+            }
             $sale->delete();
         } else {
             $app->response->setStatus(404);
         }
+    });
+
+    // Modify a :id image
+    $app->put('/images/:old/:new', function ($old, $new) use ($app) {
+        $saleImage = \Undercity\SaleImagesQuery::create()->findOneByImageId($old);
+        if ($saleImage != null) {
+            $saleImage->setImageId($new);
+            $saleImage->save();
+        } else {
+            $app->response->setStatus(404);
+        }
+    });
+
+    // Remove a :id image from SaleImages
+    $app->delete('/images/:id', function ($id) use ($app) {
+        $saleImage = \Undercity\SaleImagesQuery::create()->findOneByImageId($id);
+        if ($saleImage != null) {
+            $saleImage->delete();
+        } else {
+            $app->response->setStatus(404);
+        }
+    });
+});
+
+$app->group('/intro', function () use ($app) {
+    $app->post('/', function () use ($app) {
+
+    });
+
+    $app->get('/:from/:count', function ($from, $count) use ($app) {
+
+    });
+
+    $app->get('/:id', function ($id) use ($app) {
+
+    });
+
+    $app->put('/:id', function ($id) use ($app) {
+
+    });
+
+    $app->delete('/:id', function ($id) use ($app) {
+
+    });
+
+    $app->get('/:id/reply', function ($id) use ($app) {
+
+    });
+
+    $app->post('/:id/reply', function ($id) use ($app) {
+
+    });
+
+    $app->put('/:id/reply/:rid', function($id, $rid) use ($app) {
+
+    });
+
+    $app->delete('/:id/reply/:rid', function($id, $rid) use ($app) {
+
+    });
+
+    $app->get('/:id:/images/', function ($id) use ($app) {
+
+    });
+
+    $app->post('/:id:/images/', function ($id) use ($app) {
+
+    });
+
+    $app->put('/:id:/images/:iid', function ($id, $iid) use ($app) {
+
+    });
+
+    $app->delete('/:id:/images/:iid', function ($id, $iid) use ($app) {
+
     });
 });
 
