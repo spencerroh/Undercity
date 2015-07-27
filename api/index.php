@@ -5,6 +5,8 @@ require_once 'vendor/autoload.php';
 // setup Propel
 require_once 'config/config.php';
 
+session_start();
+
 define('RESOURCE_PATH', 'resources/');
 
 date_default_timezone_set('asia/seoul');
@@ -43,16 +45,41 @@ $app->group('/store', function () use ($app) {
 });
 
 $app->group('/user', function () use ($app) {
-    $app->post('/', function () use ($app) {
-        $user = new \Undercity\User();
+    $app->post('/login', function () use ($app) {
         $request = $app->request()->post();
 
+        if (array_key_exists('Cipher', $request)) {
+            $privateKey = openssl_pkey_get_private(file_get_contents('keys/private.pem'));
+
+            $status = openssl_private_decrypt(base64_decode($request['Cipher']),
+                                              $plainText,
+                                              $privateKey,
+                                              OPENSSL_PKCS1_OAEP_PADDING);
+
+            if ($status === false) {
+                $app->response->setStatus(501);
+            } else {
+                $response = array (
+                    'Plain' => $plainText
+                );
+
+                echo json_encode($response);
+            }
+        }
+        else {
+            $app->response->setStatus(400);
+        }
+
+
+        /*
+        $user = new \Undercity\User();
         if (array_key_exists('DeviceToken', $request)) {
             $user->setDeviceToken($request['DeviceToken']);
             $user->save();
         } else {
             $app->response->setStatus(400);
         }
+        */
     });
 });
 
@@ -201,7 +228,6 @@ $app->group('/sales', function () use ($app) {
         if ($sale != null) {
             $saleImages = \Undercity\SaleImagesQuery::create()->findBySaleId($sale->getId());
             foreach ($saleImages as $saleImage) {
-                $saleImage = \Undercity\SaleImagesQuery::create()->findOneByImageId($id);
                 $saleImage->delete();
             }
             $sale->delete();
@@ -234,7 +260,16 @@ $app->group('/sales', function () use ($app) {
 
 $app->group('/intro', function () use ($app) {
     $app->post('/', function () use ($app) {
+        $request = $app->request()->post();
 
+        if (array_key_exists('Description', $request) &&
+            array_key_exists('UserId', $request)) {
+            $intro = new \Undercity\IntroShop();
+            $intro->setDescription($request['Description']);
+
+            //$user = \Undercity\UserQuery::create()->findPk()
+
+        }
     });
 
     $app->get('/:from/:count', function ($from, $count) use ($app) {

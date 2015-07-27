@@ -11,12 +11,16 @@ Clone the repository and then copy propel.xml.dist to propel.xml. propel.xml con
 
 Run these command line to initialize external libraries and generate database model classes.
 
+    $ openssl genrsa -out keys/private.pem 2048
+    $ openssl rsa -in keys/private.pem -out keys/public.pem -outform pem -pubout
+    
     $ composer install
     $ ./vendor/bin/propel sql:build
     $ ./vendor/bin/propel sql:insert
     $ ./vendor/bin/propel model:build
     $ ./vendor/bin/propel config:convert --output-dir=config
     $ composer dump-autoload
+    
     
     
     $ npm install -g jasmine-node   
