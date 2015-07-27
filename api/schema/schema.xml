@@ -97,8 +97,9 @@
     <table name="intro_shops" phpName="IntroShop">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
+        <column name="title" type="varchar" size="256" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
-        <foreign-key foreignTable="intro_shops" phpName="IntroShop" refPhpName="User">
+        <foreign-key foreignTable="users" phpName="User" refPhpName="IntroShop">
             <reference local="user_id" foreign="id"/>
         </foreign-key>
     </table>
@@ -110,14 +111,14 @@
         <column name="description" type="longvarchar" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
         <column name="last_update_date" type="timestamp" required="true"/>
-        <column name="is_deleted" type="boolean" required="false" defaultValue="false"/>
+        <column name="is_removed" type="boolean" required="false" defaultValue="false"/>
         <foreign-key foreignTable="users" phpName="User" refPhpName="IntroShopReply">
             <reference local="user_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="intro_shops" phpName="IntroShop" refPhpName="IntroShopReply">
             <reference local="post_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="intro_shops_reply" phpName="IntroShopReply" refPhpName="IntroShopReply">
+        <foreign-key foreignTable="intro_shops_reply" phpName="ReplyOfReply" refPhpName="IntroShopReply">
             <reference local="repl_id" foreign="id"/>
         </foreign-key>
     </table>

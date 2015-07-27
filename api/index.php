@@ -46,15 +46,30 @@ $app->group('/store', function () use ($app) {
 
 $app->group('/intro', function () use ($app) {
     $app->post('/', function () use ($app) {
+        if (!isset($_SESSION['USER_ID'])) {
+            $app->response->setStatus(401);
+            return;
+        }
+
         $request = $app->request()->post();
 
         if (array_key_exists('Description', $request) &&
-            array_key_exists('UserId', $request)) {
+            array_key_exists('Title', $request)) {
             $intro = new \Undercity\IntroShop();
             $intro->setDescription($request['Description']);
+            $intro->setTitle($request['Title']);
+            $intro->setUserId($_SESSION['USER_ID']);
 
-            //$user = \Undercity\UserQuery::create()->findPk()
+            if (array_key_exists('Images', $request)) {
+                foreach ($request['Images'] as $image) {
+                    $introImage = new \Undercity\IntroShopImage();
+                    $introImage->setImageId($image);
 
+                    $intro->addIntroShopImage($introImage);
+                }
+            }
+
+            $intro->save();
         }
     });
 
@@ -63,7 +78,11 @@ $app->group('/intro', function () use ($app) {
     });
 
     $app->get('/:id', function ($id) use ($app) {
+        $intro = \Undercity\IntroShopQuery::create()->findPk($id);
 
+        if ($intro != null) {
+            echo $intro->exportTo('JSON');
+        }
     });
 
     $app->put('/:id', function ($id) use ($app) {
@@ -71,7 +90,13 @@ $app->group('/intro', function () use ($app) {
     });
 
     $app->delete('/:id', function ($id) use ($app) {
+        $intro = \Undercity\IntroShopQuery::create()->findPk($id);
 
+        if ($intro != null) {
+            $intro->getIntroShopImages()->delete();
+            $intro->getIntroShopReplies()->delete();
+            $intro->delete();
+        }
     });
 
     $app->get('/:id/reply', function ($id) use ($app) {
