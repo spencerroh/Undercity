@@ -69,6 +69,7 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="device_token" type="longvarchar" required="true"/>
         <column name="device_os" type="varchar" size="32" require="true" />
+        <column name="create_date" type="timestamp" required="true"/>
     </table>
     <table name="sales" phpName="Sale">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>

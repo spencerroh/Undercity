@@ -44,45 +44,6 @@ $app->group('/store', function () use ($app) {
     });
 });
 
-$app->group('/user', function () use ($app) {
-    $app->post('/login', function () use ($app) {
-        $request = $app->request()->post();
-
-        if (array_key_exists('Cipher', $request)) {
-            $privateKey = openssl_pkey_get_private(file_get_contents('keys/private.pem'));
-
-            $status = openssl_private_decrypt(base64_decode($request['Cipher']),
-                                              $plainText,
-                                              $privateKey,
-                                              OPENSSL_PKCS1_OAEP_PADDING);
-
-            if ($status === false) {
-                $app->response->setStatus(501);
-            } else {
-                $response = array (
-                    'Plain' => $plainText
-                );
-
-                echo json_encode($response);
-            }
-        }
-        else {
-            $app->response->setStatus(400);
-        }
-
-
-        /*
-        $user = new \Undercity\User();
-        if (array_key_exists('DeviceToken', $request)) {
-            $user->setDeviceToken($request['DeviceToken']);
-            $user->save();
-        } else {
-            $app->response->setStatus(400);
-        }
-        */
-    });
-});
-
 $app->group('/sales', function () use ($app) {
     $app->post('/', function () use ($app) {
         $request = $app->request()->post();

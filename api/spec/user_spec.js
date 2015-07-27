@@ -22,17 +22,40 @@ var publicKeyPEM =
     "0QIDAQAB" + "\n" +
     "-----END PUBLIC KEY-----" + "\n";
 
-var plainText = "Long Live the King!";
-
 var publicKey = new NodeRSA(publicKeyPEM);
-var cipherText = publicKey.encrypt(plainText, 'base64');
 
-frisby.create('Test RSA')
+var userInfo = {
+    DeviceToken: 'TEST_DEVICE_TOKEN',
+    DeviceOS: 'ANDROID'
+};
+
+var encryptedUserInfo = publicKey.encrypt(userInfo, 'base64');
+
+frisby.create('New User')
     .post(USER_API_ENDPOINT + 'login', {
-        Cipher: cipherText
+        UserInfo: encryptedUserInfo
     })
     .expectStatus(200)
     .expectJSON({
-        Plain: plainText
+        status: 'success'
+    })
+    .after(function (err, res, body) {
+        frisby.create('Is Login?')
+            .addHeader('Cookie', res.headers['set-cookie'])
+            .get(USER_API_ENDPOINT + 'is_login')
+            .expectStatus(200)
+            .after(function (err, res, body) {
+                frisby.create('Logout')
+                    .get(USER_API_ENDPOINT + 'logout')
+                    .expectStatus(200)
+                    .after( function () {
+                        frisby.create('Is Login?')
+                            .get(USER_API_ENDPOINT + 'is_login')
+                            .expectStatus(401)
+                            .toss();
+                    })
+                    .toss();
+            })
+            .toss();
     })
     .toss();
