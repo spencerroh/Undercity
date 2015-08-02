@@ -7,6 +7,10 @@
  */
 
 $app->group('/images', function () use ($app) {
+    $app->options('/', function () use ($app) {
+        $app->response->header('Allow', 'GET, POST, DELETE');
+    });
+
     $app->get('/:id', function ($id) use ($app) {
         $image = \Undercity\ImageQuery::create()->findPK($id);
 

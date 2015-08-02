@@ -33,15 +33,15 @@ frisby.create('Create a banner')
     })
     .expectStatus(200)
     .afterJSON(function (json) {
-        var imageKey = json.image;
-        formForBannerCreation.append('ImageId', imageKey);
-
         frisby.create('Create a banner object')
-            .post(BANNERS_API_ENDPOINT, formForBannerCreation, {
-                json: false,
+            .post(BANNERS_API_ENDPOINT, {
+                Contact: 'http://www.google.co.kr',
+                ContactType: 0,
+                ImageId: json.image
+            }, {
+                json: true,
                 headers: {
-                    'content-type': 'multipart/form-data; boundary=' + formForBannerCreation.getBoundary(),
-                    'content-length': formForBannerCreation.getLengthSync()
+                    'content-type': 'application/json'
                 }
             })
             .expectStatus(200)

@@ -7,10 +7,12 @@
  */
 
 $app->group('/banners', function () use ($app) {
-    $app->post('/', function () use ($app) {
-        $banner = new \Undercity\Banner();
+    $app->options('/', function () use ($app) {
+        $app->response->header('Allow', 'GET, POST, DELETE');
+    });
 
-        $request = $app->request()->post();
+    $app->post('/', function () use ($app) {
+        $request = json_decode($app->request()->getBody(), true);
 
         if (array_key_exists('Contact', $request) &&
             array_key_exists('ContactType', $request) &&
@@ -19,6 +21,7 @@ $app->group('/banners', function () use ($app) {
             $image = \Undercity\ImageQuery::create()->findPK($request['ImageId']);
 
             if ($image != NULL) {
+                $banner = new \Undercity\Banner();
                 $banner->setContact($request['Contact']);
                 $banner->setContactType($request['ContactType']);
                 $banner->setImage($image);
