@@ -4,7 +4,9 @@ var fs = require('fs');
 var path = require('path');
 var FormData = require('form-data');
 var encoding = require('encoding');
+var testUtils = require('./testUtils')
 
+var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 var SALES_API_ENDPOINT = process.env.API_ENDPOINT + 'sales/';
 var IMAGES_API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 
@@ -22,67 +24,57 @@ jpgImage.append('image', fs.createReadStream(testJpgPath), {
     knownLength: fs.statSync(testJpgPath).size
 });
 
-frisby.create('Create a Sales Event with no information')
-    .post(SALES_API_ENDPOINT, salesEventInfoWithNoInfo, {
-        json: false,
-        headers: {
-            'content-type': 'multipart/form-data; boundary=' + salesEventInfoWithNoInfo.getBoundary(),
-            'content-length': salesEventInfoWithNoInfo.getLengthSync()
-        }
-    })
-    .expectStatus(400)
-    .toss();
+
 
 var salesImages = [];
-frisby.create('Upload sale images1')
-    .post(IMAGES_API_ENDPOINT, pngImage, {
-        json: false,
-        headers: {
-            'content-type': 'multipart/form-data; boundary=' + pngImage.getBoundary(),
-            'content-length': pngImage.getLengthSync()
-        }
-    })
-    .afterJSON(function (json) {
-        salesImages.push(json.image);
 
-        frisby.create('Upload sale images2')
-            .post(IMAGES_API_ENDPOINT, jpgImage, {
+frisby.create('Login To Server')
+    .post(USER_API_ENDPOINT + 'login', {
+        UserInfo: testUtils.generateUserInfo()
+    })
+    .after(function (err, res, body) {
+        var sessionID = res.headers['set-cookie'];
+
+        frisby.create('Create a Sales Event with no information')
+            .post(SALES_API_ENDPOINT, salesEventInfoWithNoInfo, {
                 json: false,
                 headers: {
-                    'content-type': 'multipart/form-data; boundary=' + jpgImage.getBoundary(),
-                    'content-length': jpgImage.getLengthSync()
+                    'cookie': sessionID,
+                    'content-type': 'multipart/form-data; boundary=' + salesEventInfoWithNoInfo.getBoundary(),
+                    'content-length': salesEventInfoWithNoInfo.getLengthSync()
+                }
+            })
+            .expectStatus(400)
+            .toss();
+
+        frisby.create('Upload sale images1')
+            .post(IMAGES_API_ENDPOINT, pngImage, {
+                json: false,
+                headers: {
+                    'cookie': sessionID,
+                    'content-type': 'multipart/form-data; boundary=' + pngImage.getBoundary(),
+                    'content-length': pngImage.getLengthSync()
                 }
             })
             .afterJSON(function (json) {
                 salesImages.push(json.image);
 
-                frisby.create('Create a Sales Event with full information')
-                    .post(SALES_API_ENDPOINT, {
-                        Name: '하모니마트',
-                        Address: '경기도 용인시 기흥구',
-                        Contact: '031-547-7891',
-                        Title: '삼겹살 할인 이벤트 1근+1근',
-                        EventFrom: '2015-05-05',
-                        EventTo: '2015-05-09',
-                        Description: '날이면 날마다 오는... 삼겹살이에요. 덴마트산 냉동 돼지고기가 1근+1근',
-                        GPS: '35.456,127.01234',
-                        Images: salesImages
-                    })
-                    .expectStatus(200)
-                    .expectJSON({
-                        Name: '하모니마트',
-                        Address: '경기도 용인시 기흥구',
-                        Contact: '031-547-7891',
-                        Title: '삼겹살 할인 이벤트 1근+1근'
+                frisby.create('Upload sale images2')
+                    .addHeader('Cookie', sessionID)
+                    .post(IMAGES_API_ENDPOINT, jpgImage, {
+                        json: false,
+                        headers: {
+                            'cookie': sessionID,
+                            'content-type': 'multipart/form-data; boundary=' + jpgImage.getBoundary(),
+                            'content-length': jpgImage.getLengthSync()
+                        }
                     })
                     .afterJSON(function (json) {
-                        var id = json.id;
+                        salesImages.push(json.image);
 
-                        frisby.create('Get a sales event')
-                            .get(SALES_API_ENDPOINT + json.Id)
-                            .expectStatus(200)
-                            .expectJSON({
-                                Id: id,
+                        frisby.create('Create a Sales Event with full information')
+                            .addHeader('Cookie', sessionID)
+                            .post(SALES_API_ENDPOINT, {
                                 Name: '하모니마트',
                                 Address: '경기도 용인시 기흥구',
                                 Contact: '031-547-7891',
@@ -93,46 +85,72 @@ frisby.create('Upload sale images1')
                                 GPS: '35.456,127.01234',
                                 Images: salesImages
                             })
-                            .toss();
-
-                        var modifyEventTo = new FormData();
-                        modifyEventTo.append('EventTo', '2015-05-19');
-
-                        frisby.create('Modify \'EventTo\' field')
-                            .post(SALES_API_ENDPOINT + json.Id, modifyEventTo, {
-                                json: false,
-                                headers: {
-                                    'content-type': 'multipart/form-data; boundary=' + modifyEventTo.getBoundary(),
-                                    'content-length': modifyEventTo.getLengthSync()
-                                }
-                            })
                             .expectStatus(200)
                             .expectJSON({
                                 Name: '하모니마트',
-                                EventTo: '2015-05-19'
+                                Address: '경기도 용인시 기흥구',
+                                Contact: '031-547-7891',
+                                Title: '삼겹살 할인 이벤트 1근+1근'
+                            })
+                            .afterJSON(function (json) {
+                                var id = json.id;
+
+                                frisby.create('Get a sales event')
+                                    .addHeader('Cookie', sessionID)
+                                    .get(SALES_API_ENDPOINT + json.Id)
+                                    .expectStatus(200)
+                                    .expectJSON({
+                                        Id: id,
+                                        Name: '하모니마트',
+                                        Address: '경기도 용인시 기흥구',
+                                        Contact: '031-547-7891',
+                                        Title: '삼겹살 할인 이벤트 1근+1근',
+                                        EventFrom: '2015-05-05',
+                                        EventTo: '2015-05-09',
+                                        Description: '날이면 날마다 오는... 삼겹살이에요. 덴마트산 냉동 돼지고기가 1근+1근',
+                                        GPS: '35.456,127.01234',
+                                        Images: salesImages
+                                    })
+                                    .toss();
+
+                                frisby.create('Modify \'EventTo\' field')
+                                    .addHeader('Cookie', sessionID)
+                                    .post(SALES_API_ENDPOINT + json.Id, {
+                                        EventTo: '2015-05-19'
+                                    })
+                                    .expectStatus(200)
+                                    .expectJSON({
+                                        Name: '하모니마트',
+                                        EventTo: '2015-05-19'
+                                    })
+                                    .toss();
+
+                                frisby.create('Check \'EventTo\' field is changed to 2015-05-19')
+                                    .addHeader('Cookie', sessionID)
+                                    .get(SALES_API_ENDPOINT + json.Id)
+                                    .expectStatus(200)
+                                    .expectJSON({
+                                        EventTo: '2015-05-19'
+                                    })
+                                    .toss();
+
+                                frisby.create('Delete a test sales event')
+                                    .addHeader('Cookie', sessionID)
+                                    .delete(SALES_API_ENDPOINT + json.Id)
+                                    .expectStatus(200)
+                                    .toss();
+
+                                frisby.create('Check test sales event is deleted')
+                                    .addHeader('Cookie', sessionID)
+                                    .get(SALES_API_ENDPOINT + json.Id)
+                                    .expectStatus(404)
                             })
                             .toss();
 
-                        frisby.create('Check \'EventTo\' field is changed to 2015-05-19')
-                            .get(SALES_API_ENDPOINT + json.Id)
-                            .expectStatus(200)
-                            .expectJSON({
-                                EventTo: '2015-05-19'
-                            })
-                            .toss();
-
-                        frisby.create('Delete a test sales event')
-                            .delete(SALES_API_ENDPOINT + json.Id)
-                            .expectStatus(200)
-                            .toss();
-
-                        frisby.create('Check test sales event is deleted')
-                            .get(SALES_API_ENDPOINT + json.Id)
-                            .expectStatus(404)
                     })
                     .toss();
-
             })
             .toss();
     })
     .toss();
+

@@ -17,30 +17,18 @@ $app->group('/user', function () use ($app) {
                 $plainText,
                 $privateKey,
                 OPENSSL_PKCS1_OAEP_PADDING);
+
             if ($status === false) {
                 $app->response->setStatus(500);
             } else {
                 $userInfo = json_decode($plainText);
-                if (array_key_exists('DeviceToken', $userInfo) &&
+                if (array_key_exists('DeviceUUID', $userInfo) &&
+                    array_key_exists('DeviceToken', $userInfo) &&
                     array_key_exists('DeviceOS', $userInfo)) {
 
-                    $user = \Undercity\UserQuery::create()->findOneByDeviceToken($userInfo->DeviceToken);
-
-                    if ($user == null) {
-                        $user = new \Undercity\User();
-                        $user->setDeviceToken($userInfo->DeviceToken);
-                        $user->setDeviceOs($userInfo->DeviceOS);
-                        $user->setCreateDate(new DateTime('now'), new DateTimeZone('Asia/Seoul'));
-                        $user->save();
-                    }
-
-                    $_SESSION = array();
-                    $_SESSION['USER_ID'] = $user->getId();
-
-                    $response = array(
-                        'status' => 'success'
-                    );
-                    echo json_encode($response);
+                    $app->auth->logIn($userInfo->DeviceUUID,
+                                      $userInfo->DeviceToken,
+                                      $userInfo->DeviceOS);
                 } else {
                     $app->response->setStatus(400);
                 }
@@ -52,9 +40,7 @@ $app->group('/user', function () use ($app) {
     });
 
     $app->map('/is_login', function () use ($app) {
-        var_dump($_SESSION);
-
-        if (isset($_SESSION['USER_ID'])) {
+        if ($app->auth->isLoggedIn()) {
             $app->response->setStatus(200);
         } else {
             $app->response->setStatus(401);
@@ -62,7 +48,7 @@ $app->group('/user', function () use ($app) {
     })->via('GET');
 
     $app->map('/logout', function () use ($app) {
-        session_destroy();
+        $app->auth->logOut();
     })->via('GET', 'POST');
 });
 

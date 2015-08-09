@@ -12,7 +12,7 @@ $app->group('/banners', function () use ($app) {
     });
 
     $app->post('/', function () use ($app) {
-        $request = json_decode($app->request()->getBody(), true);
+        $request = $app->request()->post();
 
         if (array_key_exists('Contact', $request) &&
             array_key_exists('ContactType', $request) &&

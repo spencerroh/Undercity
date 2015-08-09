@@ -3,6 +3,15 @@
           xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
           namespace="Undercity"
         >
+    <table name="users" phpName="User">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="device_uuid" type="varchar" size="64" reqired="true" phpName="deviceUUID"/>
+        <column name="device_token" type="longvarchar" required="true"/>
+        <column name="device_os" type="varchar" size="32" require="true" phpName="deviceOS"/>
+        <column name="create_date" type="timestamp" required="true"/>
+        <column name="last_login_date" type="timestamp" required="true"/>
+    </table>
+
     <table name="images" phpName="Image">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="source" type="varchar" size="255" required="true" />
@@ -64,12 +73,6 @@
             <reference local="image_id" foreign="id"/>
         </foreign-key>
 
-    </table>
-    <table name="users" phpName="User">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="device_token" type="longvarchar" required="true"/>
-        <column name="device_os" type="varchar" size="32" require="true" />
-        <column name="create_date" type="timestamp" required="true"/>
     </table>
     <table name="sales" phpName="Sale">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>

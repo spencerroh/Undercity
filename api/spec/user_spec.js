@@ -7,49 +7,32 @@ var fs = require('fs');
 var path = require('path');
 var FormData = require('form-data');
 var encoding = require('encoding');
-var NodeRSA = require('node-rsa');
+var testUtils = require('./testUtils')
 
 var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 
-var publicKeyPEM =
-    "-----BEGIN PUBLIC KEY-----" + "\n" +
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtaZXTFziKX/5EFUjiKdz" + "\n" +
-    "6CIoT04McDOOYKbzn6V+HhNiBVTVxX/R2A7nlPWpUzCORihxJ3/gVrekpwGBECbq" + "\n" +
-    "Rij1YrktS2AgrYuNGB2oxkEMmXaQP2FhJVeRm0rZJcc8xI44nEcqhovHV6CfoaSZ" + "\n" +
-    "Ys8nqqYvpk2j7smGIOiclYnLcfsVRvdJFoySdlvfLjMEyC+vqhZKphWeSRuYAyiK" + "\n" +
-    "XvTI44bk75LYYIfFyvdS6qvVsFvjv5ZDcFnVoqcJ+hj32eXGlYIXs3re15iaaY3R" + "\n" +
-    "r8wqyZs3+4JN+EX1RXohrQFm7d/WbcMu1/LmNM7YMpTyRUga4ZAF7eBaW+9IX6gC" + "\n" +
-    "0QIDAQAB" + "\n" +
-    "-----END PUBLIC KEY-----" + "\n";
-
-var publicKey = new NodeRSA(publicKeyPEM);
-
-var userInfo = {
-    DeviceToken: 'TEST_DEVICE_TOKEN',
-    DeviceOS: 'ANDROID'
-};
-
-var encryptedUserInfo = publicKey.encrypt(userInfo, 'base64');
-
 frisby.create('New User')
     .post(USER_API_ENDPOINT + 'login', {
-        UserInfo: encryptedUserInfo
+        UserInfo: testUtils.generateUserInfo()
     })
     .expectStatus(200)
     .expectJSON({
         status: 'success'
     })
     .after(function (err, res, body) {
+        var sessionID = res.headers['set-cookie'];
         frisby.create('Is Login?')
-            .addHeader('Cookie', res.headers['set-cookie'])
+            .addHeader('Cookie', sessionID)
             .get(USER_API_ENDPOINT + 'is_login')
             .expectStatus(200)
             .after(function (err, res, body) {
                 frisby.create('Logout')
+                    .addHeader('Cookie',sessionID)
                     .get(USER_API_ENDPOINT + 'logout')
                     .expectStatus(200)
                     .after( function () {
                         frisby.create('Is Login?')
+                            .addHeader('Cookie',sessionID)
                             .get(USER_API_ENDPOINT + 'is_login')
                             .expectStatus(401)
                             .toss();

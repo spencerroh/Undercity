@@ -3,7 +3,9 @@ var process = require('process');
 var fs = require('fs');
 var path = require('path');
 var FormData = require('form-data');
+var testUtils = require('./testUtils')
 
+var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 var BANNERS_API_ENDPOINT = process.env.API_ENDPOINT + 'banners/';
 var IMAGES_API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 
@@ -14,60 +16,29 @@ formForImage.append('image', fs.createReadStream(testPngPath), {
     knownLength: fs.statSync(testPngPath).size
 });
 
-var formForBannerCreation = new FormData();
-formForBannerCreation.append('ContactType', '0');   // 0: URL, 1: Phone
-formForBannerCreation.append('Contact', 'http://www.google.co.kr');
-
-var formForBannerUpdate = new FormData();
-formForBannerUpdate.append('ContactType', '1');   // 0: URL, 1: Phone
-formForBannerUpdate.append('Contact', '010-1234-5678');
-
-
-frisby.create('Create a banner')
-    .post(IMAGES_API_ENDPOINT, formForImage, {
-        json: false,
-        headers: {
-            'content-type': 'multipart/form-data; boundary=' + formForImage.getBoundary(),
-            'content-length': formForImage.getLengthSync()
-        }
+frisby.create('Login To Server')
+    .post(USER_API_ENDPOINT + 'login', {
+        UserInfo: testUtils.generateUserInfo()
     })
-    .expectStatus(200)
-    .afterJSON(function (json) {
-        frisby.create('Create a banner object')
-            .post(BANNERS_API_ENDPOINT, {
-                Contact: 'http://www.google.co.kr',
-                ContactType: 0,
-                ImageId: json.image
-            }, {
-                json: true,
+    .after(function (err, res, body) {
+        var sessionID = res.headers['set-cookie'];
+        frisby.create('Create a banner')
+            .post(IMAGES_API_ENDPOINT, formForImage, {
+                json: false,
                 headers: {
-                    'content-type': 'application/json'
+                    'cookie': sessionID,
+                    'content-type': 'multipart/form-data; boundary=' + formForImage.getBoundary(),
+                    'content-length': formForImage.getLengthSync()
                 }
             })
             .expectStatus(200)
-            .expectJSONTypes({
-                Id: Number,
-                ContactType: Number,
-                Contact: String,
-                ImageId: Number
-            })
-            .expectJSON({
-                ContactType: 0,
-                Contact: 'http://www.google.co.kr'
-            })
             .afterJSON(function (json) {
-                frisby.create('Get a banner')
-                    .get(BANNERS_API_ENDPOINT + json.Id)
-                    .expectStatus(200)
-                    .toss();
-
-                frisby.create('Modify a banner')
-                    .post(BANNERS_API_ENDPOINT + json.Id, formForBannerUpdate, {
-                        json: false,
-                        headers: {
-                            'content-type': 'multipart/form-data; boundary=' + formForBannerUpdate.getBoundary(),
-                            'content-length': formForBannerUpdate.getLengthSync()
-                        }
+                frisby.create('Create a banner object')
+                    .addHeader('Cookie', sessionID)
+                    .post(BANNERS_API_ENDPOINT, {
+                        Contact: 'http://www.google.co.kr',
+                        ContactType: 0,
+                        ImageId: json.image
                     })
                     .expectStatus(200)
                     .expectJSONTypes({
@@ -77,19 +48,47 @@ frisby.create('Create a banner')
                         ImageId: Number
                     })
                     .expectJSON({
-                        ContactType: 1,
-                        Contact: '010-1234-5678'
+                        ContactType: 0,
+                        Contact: 'http://www.google.co.kr'
                     })
-                    .toss();
+                    .afterJSON(function (json) {
+                        frisby.create('Get a banner')
+                            .addHeader('Cookie', sessionID)
+                            .get(BANNERS_API_ENDPOINT + json.Id)
+                            .expectStatus(200)
+                            .toss();
 
-                frisby.create('Delete a banner')
-                    .delete(BANNERS_API_ENDPOINT + json.Id)
-                    .expectStatus(200)
-                    .toss();
+                        frisby.create('Modify a banner')
+                            .addHeader('Cookie', sessionID)
+                            .post(BANNERS_API_ENDPOINT + json.Id, {
+                                ContactType: 1,
+                                Contact: "010-1234-5678"
+                            })
+                            .expectStatus(200)
+                            .expectJSONTypes({
+                                Id: Number,
+                                ContactType: Number,
+                                Contact: String,
+                                ImageId: Number
+                            })
+                            .expectJSON({
+                                ContactType: 1,
+                                Contact: '010-1234-5678'
+                            })
+                            .toss();
 
-                frisby.create('Check banner is deleted')
-                    .get(BANNERS_API_ENDPOINT + json.Id)
-                    .expectStatus(404)
+                        frisby.create('Delete a banner')
+                            .addHeader('Cookie', sessionID)
+                            .delete(BANNERS_API_ENDPOINT + json.Id)
+                            .expectStatus(200)
+                            .toss();
+
+                        frisby.create('Check banner is deleted')
+                            .addHeader('Cookie', sessionID)
+                            .get(BANNERS_API_ENDPOINT + json.Id)
+                            .expectStatus(404)
+                            .toss();
+                    })
                     .toss();
             })
             .toss();
