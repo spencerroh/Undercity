@@ -29,7 +29,7 @@ jpgImage.append('image', fs.createReadStream(testJpgPath), {
 var salesImages = [];
 
 frisby.create('Login To Server')
-    .post(USER_API_ENDPOINT + 'login', {
+    .post(USER_API_ENDPOINT, {
         UserInfo: testUtils.generateUserInfo()
     })
     .after(function (err, res, body) {

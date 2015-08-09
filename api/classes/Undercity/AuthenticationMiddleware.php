@@ -12,7 +12,7 @@ class AuthenticationMiddleware extends Middleware
         $auth = $app->auth;
 
         $path = $app->request->getPath();
-        $isLoginRequest = preg_match("/login/i", $path);
+        $isLoginRequest = preg_match("/user/i", $path);
         $isImageRequest = preg_match("/images/i", $path) && $app->request->isGet();
 
         if ($auth->isLoggedIn() || $isLoginRequest || $isImageRequest) {

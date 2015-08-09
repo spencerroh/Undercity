@@ -12,7 +12,7 @@ var testUtils = require('./testUtils')
 var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 
 frisby.create('New User')
-    .post(USER_API_ENDPOINT + 'login', {
+    .post(USER_API_ENDPOINT, {
         UserInfo: testUtils.generateUserInfo()
     })
     .expectStatus(200)
@@ -23,17 +23,17 @@ frisby.create('New User')
         var sessionID = res.headers['set-cookie'];
         frisby.create('Is Login?')
             .addHeader('Cookie', sessionID)
-            .get(USER_API_ENDPOINT + 'is_login')
+            .get(USER_API_ENDPOINT)
             .expectStatus(200)
             .after(function (err, res, body) {
                 frisby.create('Logout')
                     .addHeader('Cookie',sessionID)
-                    .get(USER_API_ENDPOINT + 'logout')
+                    .delete(USER_API_ENDPOINT)
                     .expectStatus(200)
                     .after( function () {
                         frisby.create('Is Login?')
                             .addHeader('Cookie',sessionID)
-                            .get(USER_API_ENDPOINT + 'is_login')
+                            .get(USER_API_ENDPOINT)
                             .expectStatus(401)
                             .toss();
                     })

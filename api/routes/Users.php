@@ -7,7 +7,7 @@
  */
 
 $app->group('/user', function () use ($app) {
-    $app->post('/login', function () use ($app) {
+    $app->map('/', function () use ($app) {
         $request = $app->request()->post();
 
         if (array_key_exists('UserInfo', $request)) {
@@ -37,9 +37,9 @@ $app->group('/user', function () use ($app) {
         else {
             $app->response->setStatus(400);
         }
-    });
+    })->via('POST');
 
-    $app->map('/is_login', function () use ($app) {
+    $app->map('/', function () use ($app) {
         if ($app->auth->isLoggedIn()) {
             $app->response->setStatus(200);
         } else {
@@ -47,9 +47,9 @@ $app->group('/user', function () use ($app) {
         }
     })->via('GET');
 
-    $app->map('/logout', function () use ($app) {
+    $app->map('/', function () use ($app) {
         $app->auth->logOut();
-    })->via('GET', 'POST');
+    })->via('DELETE');
 });
 
 ?>

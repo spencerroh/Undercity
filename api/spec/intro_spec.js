@@ -6,12 +6,10 @@ var process = require('process');
 var fs = require('fs');
 var path = require('path');
 var FormData = require('form-data');
-var encoding = require('encoding');
 var NodeRSA = require('node-rsa');
 var encoding = require('encoding');
-var testUtils = require('./testUtils')
+var testUtils = require('./testUtils');
 
-var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 var INTRO_API_ENDPOINT = process.env.API_ENDPOINT + 'intro/';
 var IMAGES_API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
@@ -31,10 +29,10 @@ jpgImageData.append('image', fs.createReadStream(testJpgPath), {
 
 var images = [];
 frisby.create('Login To Server')
-    .post(USER_API_ENDPOINT + 'login', {
+    .post(USER_API_ENDPOINT, {
         UserInfo: testUtils.generateUserInfo()
     })
-    .after(function (err, res, body) {
+    .after(function (err, res) {
         var sessionID = res.headers['set-cookie'];
 
         frisby.create('Upload a test image1')
@@ -48,7 +46,7 @@ frisby.create('Login To Server')
                 }
             })
             .expectStatus(200)
-            .afterJSON(function (json, res) {
+            .afterJSON(function (json) {
                 images.push(json.image);
 
                 frisby.create('Upload a test image2')
@@ -62,7 +60,7 @@ frisby.create('Login To Server')
                         }
                     })
                     .expectStatus(200)
-                    .afterJSON(function (json, res) {
+                    .afterJSON(function (json) {
                         images.push(json.image);
 
                         frisby.create('Create a introduction of shop')

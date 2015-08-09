@@ -22,10 +22,10 @@ formForUpdate.append('image', fs.createReadStream(testJpgPath), {
 });
 
 frisby.create('Login To Server')
-    .post(USER_API_ENDPOINT + 'login', {
+    .post(USER_API_ENDPOINT, {
         UserInfo: testUtils.generateUserInfo()
     })
-    .after(function (err, res, body) {
+    .after(function (err, res) {
         var sessionID = res.headers['set-cookie'];
 
         frisby.create('Update a image and get a id of image')
@@ -75,7 +75,7 @@ frisby.create('Login To Server')
                     .addHeader('Cookie', sessionID)
                     .delete(IMAGES_API_ENDPOINT + imageKey)
                     .expectStatus(200)
-                    .after(function (errorCode, response, body) {
+                    .after(function () {
                         frisby.create('Check image is really deleted')
                             .addHeader('Cookie', sessionID)
                             .get(IMAGES_API_ENDPOINT + imageKey)
