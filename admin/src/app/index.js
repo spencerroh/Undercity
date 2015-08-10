@@ -1,9 +1,11 @@
 'use strict';
 
 angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngResource', 'ui.router', 'ui.bootstrap', 'ngFileUpload'])
-    .constant('SERVICE_ENDPOINT', 'http://localhost/undercity/api')
-    .constant('IMAGE_ENDPOINT', 'http://localhost/undercity/api/images/')
-    .config(function ($stateProvider, $urlRouterProvider) {
+    //    .constant('SERVICE_ENDPOINT', 'http://localhost/undercity/api')
+    //    .constant('IMAGE_ENDPOINT', 'http://localhost/undercity/api/images/')
+    .constant('SERVICE_ENDPOINT', 'http://222.122.143.163/undercity/api')
+    .constant('IMAGE_ENDPOINT', 'http://222.122.143.163/undercity/api/images/');
+.config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('home', {
                 url: '/',
