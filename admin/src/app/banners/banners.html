@@ -1,0 +1,41 @@
+<div class="panel panel-default">
+    <div class="row">
+        <div class="col-sm-offset-1 col-md-3" style="border:1px solid #000000">
+            <div class="panel-body">
+                <ul style="list-style-type:none;padding:0px">
+                    <li ng-repeat="banner in banners" style="padding:5px 0px;">
+                        <img src="{{banner.img}}" style="width:100%">
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-offset-1 col-md-6" style="border:1px solid #000000">
+            <div class="panel-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="bannerLinkAddr" class="control-label">주소</label>
+                        <input id="bannerLinkAddr" type="text" class="form-control" placeholder="http://www.google.co.kr or 010-0000-0000" ng-model="banner.addr">
+                    </div>
+                    <div class="form-group">
+                        <label for="bannerLinkType" class="control-label">주소 형태</label>
+                        <select id="bannerLinkType" class="form-control" ng-model="banner.linkType">
+                            <option value="0" default="default">URL</option>
+                            <option value="1">TEL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bannerImagePicker" class="control-label">배너 이미지</label>
+                        <div class="button form-control" ngf-select ng-model="$parent.files" ngf-multiple="false"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <button type="submit" class="btn btn-default" ng-click="onSubmit()">Upload</button>
+                        </div>
+                    </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
