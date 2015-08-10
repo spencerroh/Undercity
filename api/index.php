@@ -14,9 +14,10 @@ date_default_timezone_set('asia/seoul');
 $app = new \Slim\Slim();
 $app->auth = new \Undercity\AuthenticationService();
 $app->add(new \Undercity\AuthenticationMiddleware());
+
 $app->response->header('Access-Control-Allow-Origin', '*');
 $app->response->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-$app->response->header('Access-Control-Allow-Headers', 'Content-Type');
+$app->response->header('Access-Control-Allow-Headers', 'Content-Type, X-Device-ID');
 
 $routeFiles = (array) glob('routes/*.php');
 foreach($routeFiles as $routeFile) {
@@ -51,19 +52,14 @@ $app->group('/store', function () use ($app) {
 
 $app->group('/intro', function () use ($app) {
     $app->post('/', function () use ($app) {
-        if (!isset($_SESSION['USER_ID'])) {
-            $app->response->setStatus(401);
-            return;
-        }
-
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
         if (array_key_exists('Description', $request) &&
             array_key_exists('Title', $request)) {
             $intro = new \Undercity\IntroShop();
             $intro->setDescription($request['Description']);
             $intro->setTitle($request['Title']);
-            $intro->setUserId($_SESSION['USER_ID']);
+            $intro->setUser($app->user);
 
             if (array_key_exists('Images', $request)) {
                 foreach ($request['Images'] as $image) {
@@ -73,7 +69,6 @@ $app->group('/intro', function () use ($app) {
                     $intro->addIntroShopImage($introImage);
                 }
             }
-
             $intro->save();
         }
     });

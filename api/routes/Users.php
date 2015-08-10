@@ -7,34 +7,20 @@
  */
 
 $app->group('/user', function () use ($app) {
+    $app->options('/', function () use ($app) {
+        $app->response->header('Allow', 'GET, POST, DELETE');
+    });
+
     $app->map('/', function () use ($app) {
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
-        if (array_key_exists('UserInfo', $request)) {
-            $privateKey = openssl_pkey_get_private(file_get_contents('keys/private.pem'));
-
-            $status = openssl_private_decrypt(base64_decode($request['UserInfo']),
-                $plainText,
-                $privateKey,
-                OPENSSL_PKCS1_OAEP_PADDING);
-
-            if ($status === false) {
-                $app->response->setStatus(500);
-            } else {
-                $userInfo = json_decode($plainText);
-                if (array_key_exists('DeviceUUID', $userInfo) &&
-                    array_key_exists('DeviceToken', $userInfo) &&
-                    array_key_exists('DeviceOS', $userInfo)) {
-
-                    $app->auth->logIn($userInfo->DeviceUUID,
-                                      $userInfo->DeviceToken,
-                                      $userInfo->DeviceOS);
-                } else {
-                    $app->response->setStatus(400);
-                }
-            }
-        }
-        else {
+        if (array_key_exists('DeviceUUID', $request) &&
+            array_key_exists('DeviceToken', $request) &&
+            array_key_exists('DeviceOS', $request)) {
+            $app->auth->logIn($request['DeviceUUID'],
+                              $request['DeviceToken'],
+                              $request['DeviceOS']);
+        } else {
             $app->response->setStatus(400);
         }
     })->via('POST');

@@ -2,24 +2,36 @@
 
 namespace Undercity;
 
+use \DateTime;
 use \Undercity\UserQuery as UserQuery;
 use \Undercity\User as User;
 
 class AuthenticationService
 {
+    protected $user = null;
+
     public function logIn($deviceUUID, $deviceToken, $deviceOS)
     {
         $user = \Undercity\UserQuery::create()->findOneBydeviceUUID($deviceUUID);
+
         if ($user == null) {
             $user = new User();
             $user->setDeviceUUID($deviceUUID);
             $user->setDeviceToken($deviceToken);
             $user->setdeviceOS($deviceOS);
-            $user->save();
+            $user->setCreateDate(new DateTime('now'));
         }
 
-        $_SESSION = array();
-        $_SESSION['USER_ID'] = $user->getId();
+        if ($deviceToken !== $user->getDeviceToken() ||
+            $deviceOS !== $user->getdeviceOS()) {
+            $user->setDeviceToken($deviceToken);
+            $user->setdeviceOS($deviceOS);
+        }
+
+        $user->setLastLoginDate(new DateTime('now'));
+        $user->save();
+
+        $this->user = $user;
 
         $response = array(
             'status' => 'success'
@@ -28,19 +40,18 @@ class AuthenticationService
         echo json_encode($response);
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     public function isLoggedIn()
     {
-        return isset($_SESSION['USER_ID']);
+        return true;
     }
 
     public function logOut()
     {
-        $_SESSION = array();
-
-        if (isset($_COOKIE[session_name()])) {
-            setcookie(session_name(), '', time()-42000, '/');
-        }
-
-        session_destroy();
+        $this->user = null;
     }
 }

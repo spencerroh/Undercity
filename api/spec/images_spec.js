@@ -21,67 +21,52 @@ formForUpdate.append('image', fs.createReadStream(testJpgPath), {
     knownLength: fs.statSync(testJpgPath).size
 });
 
-frisby.create('Login To Server')
-    .post(USER_API_ENDPOINT, {
-        UserInfo: testUtils.generateUserInfo()
+frisby.globalSetup({
+    request: {
+        headers: {
+            'X-Device-Id': 'TEST_DEVICE_UUID'
+        }
+    }
+});
+
+frisby.create('Update a image and get a id of image')
+    .addHeader('content-type', 'multipart/form-data; boundary=' + formForCreate.getBoundary())
+    .addHeader('content-length', formForCreate.getLengthSync())
+    .post(IMAGES_API_ENDPOINT, formForCreate)
+    .expectStatus(200)
+    .expectHeaderContains('content-type', 'application/json')
+    .expectJSONTypes({
+        image: Number
     })
-    .after(function (err, res) {
-        var sessionID = res.headers['set-cookie'];
+    .afterJSON(function (json) {
+        var imageKey = json.image;
 
-        frisby.create('Update a image and get a id of image')
-            .post(IMAGES_API_ENDPOINT, formForCreate, {
-                json: false,
-                headers: {
-                    'cookie': sessionID,
-                    'content-type': 'multipart/form-data; boundary=' + formForCreate.getBoundary(),
-                    'content-length': formForCreate.getLengthSync()
-                }
-            })
+        frisby.create('Get a image')
+            .get(IMAGES_API_ENDPOINT + imageKey)
             .expectStatus(200)
-            .expectHeaderContains('content-type', 'application/json')
-            .expectJSONTypes({
-                image: Number
-            })
-            .afterJSON(function (json) {
-                var imageKey = json.image;
+            .expectHeaderContains('content-type', 'image/png')
+            .toss();
 
-                frisby.create('Get a image')
-                    .addHeader('Cookie', sessionID)
+        frisby.create('Modify a image')
+            .addHeader('content-type', 'multipart/form-data; boundary=' + formForUpdate.getBoundary())
+            .addHeader('content-length', formForUpdate.getLengthSync())
+            .post(IMAGES_API_ENDPOINT + imageKey, formForUpdate)
+            .expectStatus(200)
+            .toss();
+
+        frisby.create('Check image is modified')
+            .get(IMAGES_API_ENDPOINT + imageKey)
+            .expectStatus(200)
+            .expectHeaderContains('content-type', 'image/jpeg')
+            .toss();
+
+        frisby.create('Delete a image')
+            .delete(IMAGES_API_ENDPOINT + imageKey)
+            .expectStatus(200)
+            .after(function () {
+                frisby.create('Check image is really deleted')
                     .get(IMAGES_API_ENDPOINT + imageKey)
-                    .expectStatus(200)
-                    .expectHeaderContains('content-type', 'image/png')
-                    .toss();
-
-                frisby.create('Modify a image')
-                    .post(IMAGES_API_ENDPOINT + imageKey, formForUpdate, {
-                        json: false,
-                        headers: {
-                            'cookie': sessionID,
-                            'content-type': 'multipart/form-data; boundary=' + formForUpdate.getBoundary(),
-                            'content-length': formForUpdate.getLengthSync()
-                        }
-                    })
-                    .expectStatus(200)
-                    .toss();
-
-                frisby.create('Check image is modified')
-                    .addHeader('Cookie', sessionID)
-                    .get(IMAGES_API_ENDPOINT + imageKey)
-                    .expectStatus(200)
-                    .expectHeaderContains('content-type', 'image/jpeg')
-                    .toss();
-
-                frisby.create('Delete a image')
-                    .addHeader('Cookie', sessionID)
-                    .delete(IMAGES_API_ENDPOINT + imageKey)
-                    .expectStatus(200)
-                    .after(function () {
-                        frisby.create('Check image is really deleted')
-                            .addHeader('Cookie', sessionID)
-                            .get(IMAGES_API_ENDPOINT + imageKey)
-                            .expectStatus(404)
-                            .toss();
-                    })
+                    .expectStatus(404)
                     .toss();
             })
             .toss();

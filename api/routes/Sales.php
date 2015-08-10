@@ -7,7 +7,7 @@
  */
 $app->group('/sales', function () use ($app) {
     $app->post('/', function () use ($app) {
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
         $sale = new \Undercity\Sale();
 
@@ -24,11 +24,11 @@ $app->group('/sales', function () use ($app) {
             $sale->setAddress($request['Address']);
             $sale->setContact($request['Contact']);
             $sale->setTitle($request['Title']);
-            $sale->setEventFrom(new DateTime($request['EventFrom']), new DateTimeZone('Asia/Seoul'));
-            $sale->setEventTo(new DateTime($request['EventTo']), new DateTimeZone('Asia/Seoul'));
+            $sale->setEventFrom(new DateTime($request['EventFrom']));
+            $sale->setEventTo(new DateTime($request['EventTo']));
             $sale->setDescription($request['Description']);
             $sale->setGPS($request['GPS']);
-            $sale->setCreateDate(new DateTime('now'), new DateTimeZone('Asia/Seoul'));
+            $sale->setCreateDate(new DateTime('now'));
             $sale->save();
 
             if (array_key_exists('Images', $request) &&
@@ -69,7 +69,7 @@ $app->group('/sales', function () use ($app) {
     });
 
     $app->post('/:id', function ($id) use ($app) {
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
         $sale = \Undercity\SaleQuery::create()
             ->findPk($id);

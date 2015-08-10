@@ -27,52 +27,39 @@ jpgImageData.append('image', fs.createReadStream(testJpgPath), {
     knownLength: fs.statSync(testJpgPath).size
 });
 
-var images = [];
-frisby.create('Login To Server')
-    .post(USER_API_ENDPOINT, {
-        UserInfo: testUtils.generateUserInfo()
-    })
-    .after(function (err, res) {
-        var sessionID = res.headers['set-cookie'];
+frisby.globalSetup({
+    request: {
+        headers: {
+            'X-Device-Id': 'TEST_DEVICE_UUID'
+        }
+    }
+});
 
-        frisby.create('Upload a test image1')
-            .addHeader('Cookie', sessionID)
-            .post(IMAGES_API_ENDPOINT, pngImageData, {
-                json: false,
-                headers: {
-                    'cookie': sessionID,
-                    'content-type': 'multipart/form-data; boundary=' + pngImageData.getBoundary(),
-                    'content-length': pngImageData.getLengthSync()
-                }
-            })
+var images = [];
+frisby.create('Upload a test image1')
+    .addHeader('content-type', 'multipart/form-data; boundary=' + pngImageData.getBoundary())
+    .addHeader('content-length', pngImageData.getLengthSync())
+    .post(IMAGES_API_ENDPOINT, pngImageData)
+    .expectStatus(200)
+    .afterJSON(function (json) {
+        images.push(json.image);
+
+        frisby.create('Upload a test image2')
+            .addHeader('content-type', 'multipart/form-data; boundary=' + jpgImageData.getBoundary())
+            .addHeader('content-length', jpgImageData.getLengthSync())
+            .post(IMAGES_API_ENDPOINT, jpgImageData)
             .expectStatus(200)
             .afterJSON(function (json) {
                 images.push(json.image);
 
-                frisby.create('Upload a test image2')
-                    .addHeader('Cookie', sessionID)
-                    .post(IMAGES_API_ENDPOINT, jpgImageData, {
-                        json: false,
-                        headers: {
-                            'cookie': sessionID,
-                            'content-type': 'multipart/form-data; boundary=' + jpgImageData.getBoundary(),
-                            'content-length': jpgImageData.getLengthSync()
-                        }
-                    })
+                frisby.create('Create a introduction of shop')
+                    .post(INTRO_API_ENDPOINT, {
+                        Title: '아삭한 이연복 탕수육',
+                        Description: '겁나 맛난 이연복 탕수육 먹으로 오세욜!',
+                        Images: images
+                    }, {json: true})
+                    .inspectBody()
                     .expectStatus(200)
-                    .afterJSON(function (json) {
-                        images.push(json.image);
-
-                        frisby.create('Create a introduction of shop')
-                            .addHeader('Cookie', sessionID)
-                            .post(INTRO_API_ENDPOINT, {
-                                Title: '아삭한 이연복 탕수육',
-                                Description: '겁나 맛난 이연복 탕수육 먹으로 오세욜!',
-                                Images: images
-                            })
-                            .expectStatus(200)
-                            .toss();
-                    })
                     .toss();
             })
             .toss();

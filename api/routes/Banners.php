@@ -12,7 +12,7 @@ $app->group('/banners', function () use ($app) {
     });
 
     $app->post('/', function () use ($app) {
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
         if (array_key_exists('Contact', $request) &&
             array_key_exists('ContactType', $request) &&
@@ -54,7 +54,7 @@ $app->group('/banners', function () use ($app) {
     });
 
     $app->post('/:id', function ($id) use ($app) {
-        $request = $app->request()->post();
+        $request = json_decode($app->request->getBody(), true);
 
         $banner = \Undercity\BannerQuery::create()->findPK($id);
         $oldImage = null;
