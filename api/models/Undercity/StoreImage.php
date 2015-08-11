@@ -2,10 +2,10 @@
 
 namespace Undercity;
 
-use Undercity\Base\StoreImages as BaseStoreImages;
+use Undercity\Base\StoreImage as BaseStoreImage;
 
 /**
- * Skeleton subclass for representing a row from the 'storeImages' table.
+ * Skeleton subclass for representing a row from the 'store_images' table.
  *
  * 
  *
@@ -14,7 +14,7 @@ use Undercity\Base\StoreImages as BaseStoreImages;
  * long as it does not already exist in the output directory.
  *
  */
-class StoreImages extends BaseStoreImages
+class StoreImage extends BaseStoreImage
 {
 
 }

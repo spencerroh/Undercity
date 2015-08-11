@@ -4,13 +4,8 @@ var fs = require('fs');
 var path = require('path');
 var FormData = require('form-data');
 var encoding = require('encoding');
-var testUtils = require('./testUtils')
-
-var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 var SALES_API_ENDPOINT = process.env.API_ENDPOINT + 'sales/';
 var IMAGES_API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
-
-var salesEventInfoWithNoInfo = new FormData();
 
 var testPngPath = path.resolve(__dirname, 'resources/test.png');
 var testJpgPath = path.resolve(__dirname, 'resources/test.jpg');

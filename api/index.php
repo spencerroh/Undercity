@@ -18,6 +18,13 @@ $app->response->header('Access-Control-Allow-Origin', '*');
 $app->response->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
 $app->response->header('Access-Control-Allow-Headers', 'Content-Type, X-Device-ID');
 
+function keyExists($keys, $array) {
+    $isAllExists = true;
+    foreach($keys as $key) {
+        $isAllExists &= array_key_exists($key, $array);
+    }
+    return $isAllExists;
+}
 // include all routers
 $routeFiles = (array) glob('routes/*.php');
 foreach($routeFiles as $routeFile) {

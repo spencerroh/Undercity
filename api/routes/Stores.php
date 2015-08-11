@@ -5,27 +5,75 @@
  */
 
 $app->group('/store', function () use ($app) {
+    $app->post('/', function() use ($app) {
+        $request = json_decode($app->request->getBody(), true);
+
+        if (keyExists(array('Name', 'Address', 'Contact', 'Product', 'Description', 'GPS', 'Images'), $request)) {
+            $store = new \Undercity\Store();
+
+            $store->setName($request['Name']);
+            $store->setAddress($request['Address']);
+            $store->setContact($request['Contact']);
+            $store->setProduct($request['Product']);
+            $store->setDescription($request['Description']);
+            $store->setGPS($request['GPS']);
+
+            $store->setCreateDate(new DateTime('now'));
+
+            foreach($request['Images'] as $imageId) {
+                $storeImage = new \Undercity\StoreImage();
+                $storeImage->setImageId($imageId);
+                $store->addStoreImage($storeImage);
+            }
+
+            $store->save();
+            $store->toArray();
+            //echo json_encode(, true);
+        } else {
+            $app->response->setStatus(400);
+        }
+    });
+
     $app->get('/:from/:count', function ($from, $count) use ($app) {
         $lastStore = null;
 
         if ($from == -1) {
             $lastStore = \Undercity\StoreQuery::create()
-                ->orderByCreatedate(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
                 ->findOne();
         } else {
             $lastStore = \Undercity\StoreQuery::create()
-                ->findPk($from);
+                ->filterById(array('max' => $from))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->findOne();
         }
 
         if ($lastStore != null) {
-            $createDate = $lastStore->getCreateDate();
+            $query = \Undercity\StoreQuery::create()
+                ->filterById(array('max' => $lastStore->getId()))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC);
+            if ($count != -1) {
+                $query = $query->limit($count);
+            }
 
-            \Undercity\StoreQuery::create()
-                ->filterByCreateDate();
+            $stores = $query->find();
 
+            echo json_encode($stores->toArray(), true);
         } else {
-            $app->response->setStatus(204);
-            return;
+            echo json_encode(array(), true);
+        }
+    });
+
+    $app->delete('/:id', function ($id) use ($app) {
+        $store = \Undercity\StoreQuery::create()->findOneById($id);
+        if ($store != null) {
+            $store->getStoreImages()->delete();
+            foreach ($store->getStoreImages() as $storeImage) {
+                $storeImage->getImage()->delete();
+            }
+            $store->delete();
+        } else {
+            $app->response->setStatus(400);
         }
     });
 });

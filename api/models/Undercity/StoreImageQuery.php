@@ -2,10 +2,10 @@
 
 namespace Undercity;
 
-use Undercity\Base\StoreImagesQuery as BaseStoreImagesQuery;
+use Undercity\Base\StoreImageQuery as BaseStoreImageQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'storeImages' table.
+ * Skeleton subclass for performing query and update operations on the 'store_images' table.
  *
  * 
  *
@@ -14,7 +14,7 @@ use Undercity\Base\StoreImagesQuery as BaseStoreImagesQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class StoreImagesQuery extends BaseStoreImagesQuery
+class StoreImageQuery extends BaseStoreImageQuery
 {
 
 }
