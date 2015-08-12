@@ -1,0 +1,95 @@
+<div class="panel panel-default">
+    <div class="section">
+        <span class="title" ng-click="toggleCollapse()">할인 이벤트</span>
+
+        <div class="adminInputForm">
+            <div class="form-group">
+                <label for="name">상호명</label>
+                <input type="text" class="form-control" id="name" placeholder="상호명" ng-model="sale.Name"
+                       ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" class="form-control" id="title" placeholder="할인 이벤트 제목" ng-model="sale.Title"
+                       ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="storeAddr">상점 주소</label>
+                <input type="text" class="form-control" id="storeAddr" placeholder="주소" ng-model="sale.Address"
+                       ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="storeContact">연락처</label>
+                <input type="text" class="form-control" id="storeContact" placeholder="전화번호" ng-model="sale.Contact"
+                       ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="storeDescription">상점 소개</label>
+                <textarea class="form-control" id="storeDescription" rows="5" ng-model="sale.Description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="GPS">GPS</label>
+                <input type="text" class="form-control" id="GPS" placeholder="XXX, YYY" ng-model="sale.GPS"
+                       ng-pattern="/[0-9]+, [0-9]+/">
+            </div>
+            <div class="form-group">
+                <label for="eventFrom">할인 시작</label>
+                <input id="eventFrom" type="date" class="form-control" ng-model="sale.EventFrom">
+            </div>
+            <div class="form-group">
+                <label for="eventTo">할인 종료</label>
+                <input id="eventTo" type="date" class="form-control" ng-model="sale.EventTo">
+            </div>
+            <div class="form-group">
+                <label for="saleImages">상점 이미지</label>
+                <input id="saleImages" type="file" class="form-control" ngf-select ng-model="$parent.saleImages"
+                       ngf-multiple="true">
+                <ul class="imagePreview">
+                    <li ng-repeat="image in saleImages">
+                        <img ngf-src="image"/>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-group">
+                <button type="reset" class="btn btn-danger" ng-click="removeCurrentSale()">지우기</button>
+                <button type="button" class="btn btn-success pull-right" ng-click="submitCurrentSale()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <span class="title" ng-click="toggleCollapse()">할인 이벤트</span>
+
+        <div class="adminInputForm">
+            <table class="table table-hover">
+                <tr>
+                    <th width="5%">ID</th>
+                    <th>상점</th>
+                    <th>제목</th>
+                    <th width="10%">연락처</th>
+                    <th width="10%">시작</th>
+                    <th width="10%">종료</th>
+                    <th width="10%">작업</th>
+                </tr>
+                <tr ng-repeat-start="item in sales">
+                    <td>{{item.Id}}</td>
+                    <td>{{item.Name}}</td>
+                    <td>{{item.Title}}</td>
+                    <td>{{item.Contact}}</td>
+                    <td>{{item.EventFrom | date: 'yyyy-MM-dd'}}</td>
+                    <td>{{item.EventTo | date: 'yyyy-MM-dd'}}</td>
+                    <td><a href="#" ng-click="removeSaleEvent(item.Id)">삭제</a></td>
+                </tr>
+                <tr ng-repeat-end>
+                    <td colspan="6">
+                        <ul class="imagePreview">
+                            <li ng-repeat="image in item.Images">
+                                <img ng-src="{{getImageURL(image)}}"/>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

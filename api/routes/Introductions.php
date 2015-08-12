@@ -14,6 +14,8 @@ $app->group('/intro', function () use ($app) {
             $intro->setDescription($request['Description']);
             $intro->setTitle($request['Title']);
             $intro->setUser($app->user);
+            $intro->setCreateDate(new DateTime('now'));
+            $intro->setLastUpdateDate(new DateTime('now'));
 
             if (array_key_exists('Images', $request)) {
                 foreach ($request['Images'] as $image) {
@@ -28,14 +30,40 @@ $app->group('/intro', function () use ($app) {
     });
 
     $app->get('/:from/:count', function ($from, $count) use ($app) {
+        $lastIntroShop = null;
 
+        if ($from == -1) {
+            $lastIntroShop = \Undercity\IntroShopQuery::create()
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->findOne();
+        } else {
+            $lastIntroShop = \Undercity\IntroShopQuery::create()
+                ->filterById(array('max' => $from))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->findOne();
+        }
+
+        if ($lastIntroShop != null) {
+            $query = \Undercity\IntroShopQuery::create()
+                ->filterById(array('max' => $lastIntroShop->getId()))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC);
+            if ($count != -1) {
+                $query = $query->limit($count);
+            }
+
+            $introShops = $query->find();
+
+            echo json_encode($introShops->toArray(), true);
+        } else {
+            echo json_encode(array(), true);
+        }
     });
 
     $app->get('/:id', function ($id) use ($app) {
         $intro = \Undercity\IntroShopQuery::create()->findPk($id);
 
         if ($intro != null) {
-            echo $intro->exportTo('JSON');
+            echo json_encode($intro->toArray(), true);
         }
     });
 
@@ -51,10 +79,7 @@ $app->group('/intro', function () use ($app) {
             $intro->setTitle($request['Title']);
         }
 
-        if (array_key_exists('Images', $request)) {
-            $images = $intro->getIntroShopImages();
-
-        }
+        $intro->setLastUpdateDate(new DateTime('now'));
     });
 
     $app->delete('/:id', function ($id) use ($app) {

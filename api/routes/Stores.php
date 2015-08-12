@@ -34,6 +34,14 @@ $app->group('/store', function () use ($app) {
         }
     });
 
+    $app->get('/:id', function ($id) use ($app) {
+        $shop = \Undercity\StoreQuery::create()->findPk($id);
+
+        if ($shop != null) {
+            echo json_encode($shop->toArray(), true);
+        }
+    });
+
     $app->get('/:from/:count', function ($from, $count) use ($app) {
         $lastStore = null;
 

@@ -39,4 +39,16 @@ class Sale extends BaseSale
             return parent::getEventTo($format);
         }
     }
+
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false) {
+        $arr = parent::toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, $includeForeignObjects);
+
+        $images = array();
+        foreach ($this->getSaleImages() as $saleImage) {
+            array_push($images, $saleImage->getImageId());
+        }
+
+        $arr['Images'] = $images;
+        return $arr;
+    }
 }

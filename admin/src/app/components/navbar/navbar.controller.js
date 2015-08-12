@@ -1,6 +1,6 @@
 'use strict';
 
 angular.module('undercity')
-    .controller('NavbarCtrl', function ($scope) {
+    .controller('NavbarCtrl', function () {
 
     });

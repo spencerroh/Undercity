@@ -8,10 +8,9 @@ angular.module('undercity')
             $scope.banners = [];
             bannerService.readAll({}, function (data) {
                 data.forEach(function (currentValue) {
-                    console.log(currentValue);
                     var url = '';
-                    if (currentValue.ContactType == 1) {
-                        url = 'tel:'
+                    if (currentValue.ContactType === 1) {
+                        url = 'tel:';
                     }
 
                     url += currentValue.Contact;
@@ -29,9 +28,9 @@ angular.module('undercity')
         $scope.banners = [];
         $scope.banner = {};
         $scope.onSubmit = function () {
-            if ($scope.banner.addr != undefined &&
-                $scope.banner.linkType != undefined &&
-                $scope.files != undefined) {
+            if ($scope.banner.addr !== undefined &&
+                $scope.banner.linkType !== undefined &&
+                $scope.files !== undefined) {
                 imageService
                     .create($scope.files)
                     .success(function (data) {
@@ -39,18 +38,12 @@ angular.module('undercity')
                             'Contact': $scope.banner.addr,
                             'ContactType': $scope.banner.linkType,
                             'ImageId': data.image
-                        }, function (response) {
+                        }, function () {
                             refreshBanners();
                         });
                     });
             }
         };
-
-        $scope.$watch('files', function () {
-            if ($scope.files != undefined) {
-                console.log($scope.files);
-            }
-        });
 
         refreshBanners();
     });

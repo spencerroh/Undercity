@@ -90,10 +90,10 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="sale_id" type="integer" required="true"/>
         <column name="image_id" type="integer" required="true"/>
-        <foreign-key foreignTable="sales" phpName="Sale" refPhpName="SaleImages">
+        <foreign-key foreignTable="sales" phpName="Sale" refPhpName="SaleImage">
             <reference local="sale_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="images" phpName="Image" refPhpName="SaleImages">
+        <foreign-key foreignTable="images" phpName="Image" refPhpName="SaleImage">
             <reference local="image_id" foreign="id"/>
         </foreign-key>
     </table>
@@ -102,6 +102,8 @@
         <column name="user_id" type="integer" required="true"/>
         <column name="title" type="varchar" size="256" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
+        <column name="create_date" type="timestamp" required="true"/>
+        <column name="last_update_date" type="timestamp" required="true"/>
         <foreign-key foreignTable="users" phpName="User" refPhpName="IntroShop">
             <reference local="user_id" foreign="id"/>
         </foreign-key>

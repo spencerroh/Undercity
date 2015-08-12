@@ -143,6 +143,36 @@ $app->group('/sales', function () use ($app) {
         }
     });
 
+    $app->get('/:from/:count', function ($from, $count) use ($app) {
+        $lastSales = null;
+
+        if ($from == -1) {
+            $lastSales = \Undercity\SaleQuery::create()
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->findOne();
+        } else {
+            $lastSales = \Undercity\SaleQuery::create()
+                ->filterById(array('max' => $from))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
+                ->findOne();
+        }
+
+        if ($lastSales != null) {
+            $query = \Undercity\SaleQuery::create()
+                ->filterById(array('max' => $lastSales->getId()))
+                ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC);
+            if ($count != -1) {
+                $query = $query->limit($count);
+            }
+
+            $sales = $query->find();
+
+            echo json_encode($sales->toArray(), true);
+        } else {
+            echo json_encode(array(), true);
+        }
+    });
+
     $app->delete('/:id', function ($id) use ($app) {
         $sale = \Undercity\SaleQuery::create()
             ->findPk($id);

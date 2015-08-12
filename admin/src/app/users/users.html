@@ -1,3 +1,25 @@
-<div>
-    <button class="btn btn-default" type="submit">Button</button>
+<div class="panel panel-default">
+    <div class="section">
+        <span class="title" ng-click="toggleCollapse()">사용자 추가</span>
+        <div class="adminInputForm" collapse="isCollapsed">
+            <div class="form-group">
+                <label for="deviceUUID">디바이스 UUID</label>
+                <input type="text" class="form-control" id="deviceUUID" placeholder="UUID" ng-model="user.DeviceUUID" ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="deviceToken">디바이스 Token</label>
+                <input type="text" class="form-control" id="deviceToken" placeholder="Token" ng-model="user.DeviceToken" ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <label for="deviceOS">디바이스 OS</label>
+                <input type="text" class="form-control" id="deviceOS" placeholder="OS" ng-model="user.DeviceOS" ng-minlength="1">
+            </div>
+            <div class="form-group">
+                <button type="reset" class="btn btn-danger" ng-click="removeCurrentUser()">지우기</button>
+                <button type="reset" class="btn btn-default" ng-click="setTestDevice()">테스트</button>
+                <button type="reset" class="btn btn-default" ng-click="setAdminDevice()">관리자</button>
+                <button type="button" class="btn btn-success pull-right" ng-click="submitCurrentUser()">확인</button>
+            </div>
+        </div>
+    </div>
 </div>

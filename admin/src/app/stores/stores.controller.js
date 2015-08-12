@@ -3,6 +3,7 @@
 angular.module('undercity')
     .controller('StoresCtrl', function ($scope, imageService, $q, storeService) {
         'use strict';
+
         $scope.store = {
             'Name': '하모니마트',
             'Address': '경기도 용인시 기흥구 구갈동 강남마을 4단지 상가',
@@ -15,11 +16,10 @@ angular.module('undercity')
         $scope.removeCurrentStore = function () {
             $scope.store = {};
             $scope.storeForm.$setPristine(true);
-        }
+        };
 
         $scope.submitCurrentStore = function () {
-            console.log($scope.Images);
-            if ($scope.Images != undefined) {
+            if ($scope.Images !== undefined) {
                 var $imageKey = [];
                 var $imagePromise = [];
                 $scope.Images.forEach(function (data) {
@@ -29,15 +29,15 @@ angular.module('undercity')
                         })
                     );
                 });
-                $q.all($imagePromise).then(function (result) {
+                $q.all($imagePromise).then(function () {
                     $scope.store.Images = $imageKey;
 
-                    storeService.create($scope.store, function (data) {
+                    storeService.create($scope.store, function () {
                         refreshStores();
                     });
                 });
             }
-        }
+        };
 
         function refreshStores() {
             storeService.readAll({
@@ -52,8 +52,8 @@ angular.module('undercity')
                 id: id
             }, function (){
                 refreshStores();
-            })
-        }
+            });
+        };
 
         refreshStores();
     });
