@@ -3,6 +3,7 @@
 namespace Undercity;
 
 use Undercity\Base\Sale as BaseSale;
+use Propel\Runtime\Map\TableMap;
 
 /**
  * Skeleton subclass for representing a row from the 'sales' table.
