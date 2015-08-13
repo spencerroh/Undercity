@@ -13,7 +13,7 @@ angular.module('undercity')
             EndDate: new Date('2015-08-15T12:57:00'),
             Description: '날마다 오는 딜이 아닙니다'
         };
-        $scope.deals = [];
+        $scope.items = [];
 
         function refreshItems() {
             service.readAll({

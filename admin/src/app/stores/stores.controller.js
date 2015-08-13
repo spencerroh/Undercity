@@ -1,10 +1,11 @@
 /*jslint browser: true*/
 /*global angular*/
 angular.module('undercity')
-    .controller('StoresCtrl', function ($scope, imageService, $q, storeService) {
+    .controller('StoresCtrl', function ($scope, imageService, $q, IMAGE_ENDPOINT, storeService) {
         'use strict';
 
-        $scope.store = {
+        var service = storeService;
+        $scope.item = {
             'Name': '하모니마트',
             'Address': '경기도 용인시 기흥구 구갈동 강남마을 4단지 상가',
             'Contact': '031-254-7852',
@@ -12,48 +13,54 @@ angular.module('undercity')
             'Description': '우리 으여니형님이 운영하는 마트임메다',
             'GPS': '37.548, 127.5'
         };
+        $scope.items = [];
 
-        $scope.removeCurrentStore = function () {
-            $scope.store = {};
-            $scope.storeForm.$setPristine(true);
+        function refreshItems() {
+            service.readAll({
+                id: -1, count: -1
+            }, function (data) {
+                $scope.items = data;
+            });
+        }
+
+        refreshItems();
+
+        $scope.removeInputs = function () {
+            $scope.item = {};
+            $scope.itemImages.length = 0;
         };
 
-        $scope.submitCurrentStore = function () {
-            if ($scope.Images !== undefined) {
+        $scope.submitInputs = function () {
+            if ($scope.itemImages !== undefined) {
                 var $imageKey = [];
                 var $imagePromise = [];
-                $scope.Images.forEach(function (data) {
+                $scope.itemImages.forEach(function (data) {
                     $imagePromise.push(
                         imageService.create(data).success(function (data) {
                             $imageKey.push(data.image);
                         })
                     );
                 });
-                $q.all($imagePromise).then(function () {
-                    $scope.store.Images = $imageKey;
 
-                    storeService.create($scope.store, function () {
-                        refreshStores();
+                $q.all($imagePromise).then(function () {
+                    $scope.item.Images = $imageKey;
+
+                    service.create($scope.item, function () {
+                        refreshItems();
                     });
                 });
             }
         };
 
-        function refreshStores() {
-            storeService.readAll({
-                id: -1, count: -1
-            }, function (data) {
-                $scope.stores = data;
-            });
-        }
-
-        $scope.removeStore = function (id) {
-            storeService.delete({
+        $scope.removeItem = function (id) {
+            service.delete({
                 id: id
-            }, function (){
-                refreshStores();
+            }, function () {
+                refreshItems();
             });
         };
 
-        refreshStores();
+        $scope.getImageURL = function (imageId) {
+            return IMAGE_ENDPOINT + imageId;
+        };
     });

@@ -5,45 +5,45 @@
         <form class="adminInputForm" collapse="isCollapsed" name="storeForm">
             <div class="form-group">
                 <label for="storeName">상호명</label>
-                <input type="text" class="form-control" id="storeName" placeholder="상호" ng-model="store.Name"
+                <input type="text" class="form-control" id="storeName" placeholder="상호" ng-model="item.Name"
                        ng-minlength="1">
             </div>
             <div class="form-group">
                 <label for="storeAddr">상점 주소</label>
-                <input type="text" class="form-control" id="storeAddr" placeholder="주소" ng-model="store.Address"
+                <input type="text" class="form-control" id="storeAddr" placeholder="주소" ng-model="item.Address"
                        ng-minlength="1">
             </div>
             <div class="form-group">
                 <label for="storeContact">연락처</label>
-                <input type="text" class="form-control" id="storeContact" placeholder="전화번호" ng-model="store.Contact"
+                <input type="text" class="form-control" id="storeContact" placeholder="전화번호" ng-model="item.Contact"
                        ng-minlength="1">
             </div>
             <div class="form-group">
                 <label for="storeProduct">품목</label>
                 <input type="text" class="form-control" id="storeProduct" placeholder="주로 취급하는 상품"
-                       ng-model="store.Product" ng-minlength="1">
+                       ng-model="item.Product" ng-minlength="1">
             </div>
             <div class="form-group">
                 <label for="storeProduct">GPS</label>
-                <input type="text" class="form-control" id="storeGPS" placeholder="XXX, YYY" ng-model="store.GPS"
+                <input type="text" class="form-control" id="storeGPS" placeholder="XXX, YYY" ng-model="item.GPS"
                        ng-pattern="/[0-9]+, [0-9]+/">
             </div>
             <div class="form-group">
                 <label for="storeDescription">상점 소개</label>
-                <textarea class="form-control" id="storeDescription" rows="5" ng-model="store.Description"></textarea>
+                <textarea class="form-control" id="storeDescription" rows="5" ng-model="item.Description"></textarea>
             </div>
             <div class="form-group">
-                <label for="storeDescription">상점 이미지</label>
-                <input type="file" class="form-control" ngf-select ng-model="$parent.Images" ngf-multiple="true">
-                <ul>
-                    <li ng-repeat="image in Images">
+                <label for="introImages">상점 이미지</label>
+                <input id="introImages" type="file" class="form-control" ngf-select ng-model="$parent.itemImages" ngf-multiple="true">
+                <ul class="imagePreview">
+                    <li ng-repeat="image in itemImages">
                         <img ngf-src="image"/>
                     </li>
                 </ul>
             </div>
             <div class="form-group">
-                <button type="reset" class="btn btn-danger" ng-click="removeCurrentStore()">지우기</button>
-                <button type="button" class="btn btn-default pull-right" ng-click="submitCurrentStore()">확인</button>
+                <button type="reset" class="btn btn-danger" ng-click="removeInputs()">지우기</button>
+                <button type="button" class="btn btn-default pull-right" ng-click="submitInputs()">확인</button>
             </div>
         </form>
     </div>
@@ -60,14 +60,23 @@
                     <th>GPS</th>
                     <th></th>
                 </tr>
-                <tr ng-repeat="s in stores">
-                    <td>{{s.Id}}</td>
-                    <td>{{s.Name}}</td>
-                    <td>{{s.Address}}</td>
-                    <td>{{s.Contact}}</td>
-                    <td>{{s.Product}}</td>
-                    <td>{{s.GPS}}</td>
-                    <td><a href="#" ng-click="removeStore(s.Id)">삭제</a></td>
+                <tr ng-repeat-start="item in items">
+                    <td>{{item.Id}}</td>
+                    <td>{{item.Name}}</td>
+                    <td>{{item.Address}}</td>
+                    <td>{{item.Contact}}</td>
+                    <td>{{item.Product}}</td>
+                    <td>{{item.GPS}}</td>
+                    <td><a href="#" ng-click="removeItem(item.Id)">삭제</a></td>
+                </tr>
+                <tr ng-repeat-end>
+                    <td colspan="7">
+                        <ul class="imagePreview">
+                            <li ng-repeat="image in item.Images">
+                                <img ng-src="{{getImageURL(image)}}"/>
+                            </li>
+                        </ul>
+                    </td>
                 </tr>
             </table>
         </div>

@@ -53,7 +53,7 @@
                     <td>{{item.Id}}</td>
                     <td>{{item.Title}}</td>
                     <td>{{item.NickName}}</td>
-                    <td>{{item.EndDate}}</td>
+                    <td>{{item.EndDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
                     <td>{{item.Description}}</td>
                     <td>{{item.Replies.length}}</td>
                     <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
@@ -61,7 +61,7 @@
                     <td><a href="#" ng-click="removeItem(item.Id)">삭제</a></td>
                 </tr>
                 <tr ng-repeat-end>
-                    <td colspan="8">
+                    <td colspan="9">
                         <ul class="imagePreview">
                             <li ng-repeat="image in item.Images">
                                 <img ng-src="{{getImageURL(image)}}"/>

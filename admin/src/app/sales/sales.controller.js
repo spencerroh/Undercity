@@ -44,14 +44,18 @@ angular.module('undercity')
                     $scope.sale.Images = $imageKey;
 
                     saleService.create($scope.sale, function () {
-                        //refreshStores();
+                        refreshSaleEvents();
                     });
                 });
             }
         };
 
         $scope.removeSaleEvent = function (saleId) {
-
+            saleService.delete({
+                id: saleId
+            }, function () {
+                refreshSaleEvents();
+            });
         };
 
         $scope.getImageURL = function (imageId) {
