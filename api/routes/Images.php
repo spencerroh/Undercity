@@ -73,7 +73,9 @@ $app->group('/images', function () use ($app) {
             }
 
             $file = $_FILES['image'];
-            $filename = uniqid() . '.' . pathinfo($file['name'])['extension'];
+
+
+            $filename = uniqid();// . '.' . pathinfo($file['name'])['extension'];
 
             if (is_uploaded_file($file['tmp_name'])) {
                 move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $filename);
