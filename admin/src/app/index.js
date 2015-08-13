@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngResource', 'ui.router', 'ui.bootstrap', 'ngFileUpload'])
-    //.constant('SERVICE_ENDPOINT', 'http://localhost/undercity/api')
-    //.constant('IMAGE_ENDPOINT', 'http://localhost/undercity/api/images/')
-    .constant('SERVICE_ENDPOINT', 'http://222.122.143.163/undercity/api')
-    .constant('IMAGE_ENDPOINT', 'http://222.122.143.163/undercity/api/images/')
+    .constant('SERVICE_ENDPOINT', 'http://localhost/undercity/api')
+    .constant('IMAGE_ENDPOINT', 'http://localhost/undercity/api/images/')
+    //.constant('SERVICE_ENDPOINT', 'http://222.122.143.163/undercity/api')
+    //.constant('IMAGE_ENDPOINT', 'http://222.122.143.163/undercity/api/images/')
     .config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('home', {
@@ -36,6 +36,11 @@ angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 
                 url: 'sales',
                 templateUrl: 'app/sales/sales.html',
                 controller: 'SalesCtrl'
+            })
+            .state('home.lightningdeal', {
+                url: 'lightningdeals',
+                templateUrl: 'app/lightningdeals/lightningdeals.html',
+                controller: 'LightningDealCtrl'
             });
 
         $urlRouterProvider.otherwise('/');

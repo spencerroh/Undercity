@@ -100,6 +100,7 @@
     <table name="intro_shops" phpName="IntroShop">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
+        <column name="nick_name" type="varchar" size="64" required="true"/>
         <column name="title" type="varchar" size="256" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
@@ -136,6 +137,51 @@
             <reference local="post_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="images" phpName="Image" refPhpName="IntroShopImage">
+            <reference local="image_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="lightning_deals" phpName="LightningDeal">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true"/>
+        <column name="nick_name" type="varchar" size="64" required="true"/>
+        <column name="title" type="varchar" size="256" required="true"/>
+        <column name="description" type="longvarchar" required="true"/>
+        <column name="end_date" type="timestamp" required="true" />
+        <column name="create_date" type="timestamp" required="true"/>
+        <column name="last_update_date" type="timestamp" required="true"/>
+        <foreign-key foreignTable="users" phpName="User" refPhpName="LightningDeal">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+    </table>
+    <table name="lightning_deal_replies" phpName="LightningDealReply">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true"/>
+        <column name="post_id" type="integer" required="true"/>
+        <column name="repl_id" type="integer" required="false"/>
+        <column name="description" type="longvarchar" required="true"/>
+        <column name="create_date" type="timestamp" required="true"/>
+        <column name="last_update_date" type="timestamp" required="true"/>
+        <column name="is_removed" type="boolean" required="false" defaultValue="false"/>
+        <foreign-key foreignTable="users" phpName="User" refPhpName="LightningDealReply">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="lightning_deals" phpName="LightningDeal" refPhpName="LightningDealReply">
+            <reference local="post_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="lightning_deal_replies" phpName="ReplyOfReply" refPhpName="LightningDealReply">
+            <reference local="repl_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="lightning_deal_images" phpName="LightningDealImage">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="post_id" type="integer" required="true"/>
+        <column name="image_id" type="integer" required="true"/>
+        <foreign-key foreignTable="lightning_deals" phpName="LightningDeal" refPhpName="LightningDealImage">
+            <reference local="post_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="images" phpName="Image" refPhpName="LightningDealImage">
             <reference local="image_id" foreign="id"/>
         </foreign-key>
     </table>

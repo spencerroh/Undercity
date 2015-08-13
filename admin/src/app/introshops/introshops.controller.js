@@ -43,6 +43,14 @@ angular.module('undercity')
 
         refreshIntroShop();
 
+        $scope.removeItem = function (id) {
+            introShopService.delete({
+                id: id
+            }, function () {
+                refreshIntroShop();
+            });
+        };
+
         $scope.getImageURL = function (imageId) {
             return IMAGE_ENDPOINT + imageId;
         };

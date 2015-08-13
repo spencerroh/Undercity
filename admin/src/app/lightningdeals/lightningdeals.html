@@ -3,29 +3,33 @@
         <span class="title" ng-click="toggleCollapse()">가게 소개 올리기</span>
         <div class="adminInputForm">
             <div class="form-group">
-                <label for="introTitle">제목</label>
-                <input type="text" class="form-control" id="introTitle" placeholder="글 제목" ng-model="intro.Title" ng-minlength="1">
+                <label for="dealTitle">제목</label>
+                <input type="text" class="form-control" id="dealTitle" placeholder="글 제목" ng-model="item.Title" ng-minlength="1">
             </div>
             <div class="form-group">
-                <label for="introNickName">닉네임</label>
-                <input type="text" class="form-control" id="introNickName" placeholder="글쓴이" ng-model="intro.NickName" ng-minlength="1">
+                <label for="dealNickName">닉네임</label>
+                <input type="text" class="form-control" id="dealNickName" placeholder="글쓴이" ng-model="item.NickName" ng-minlength="1">
             </div>
             <div class="form-group">
-                <label for="introDescription">상점 소개</label>
-                <textarea class="form-control" id="introDescription" rows="5" ng-model="intro.Description" placeholder="삼점에 대한 홍보내용을 쓰세요"></textarea>
+                <label for="dealEndDate">마감시작</label>
+                <input id="dealEndDate" type="datetime-local" class="form-control" ng-model="item.EndDate">
+            </div>
+            <div class="form-group">
+                <label for="dealDescription">이벤트 소개</label>
+                <textarea class="form-control" id="dealDescription" rows="5" ng-model="item.Description" placeholder="삼점에 대한 홍보내용을 쓰세요"></textarea>
             </div>
             <div class="form-group">
                 <label for="introImages">상점 이미지</label>
-                <input id="introImages" type="file" class="form-control" ngf-select ng-model="$parent.introImages" ngf-multiple="true">
+                <input id="introImages" type="file" class="form-control" ngf-select ng-model="$parent.itemImages" ngf-multiple="true">
                 <ul class="imagePreview">
-                    <li ng-repeat="image in introImages">
+                    <li ng-repeat="image in itemImages">
                         <img ngf-src="image"/>
                     </li>
                 </ul>
             </div>
             <div class="form-group">
-                <button type="reset" class="btn btn-danger" ng-click="removeCurrentIntro()">지우기</button>
-                <button type="button" class="btn btn-success pull-right" ng-click="submitCurrentIntro()">확인</button>
+                <button type="reset" class="btn btn-danger" ng-click="removeInputs()">지우기</button>
+                <button type="button" class="btn btn-success pull-right" ng-click="submitInputs()">확인</button>
             </div>
         </div>
     </div>
@@ -38,24 +42,26 @@
                     <th width="5%">ID</th>
                     <th>글 제목</th>
                     <th>닉네임</th>
+                    <th width="10%">마감일</th>
                     <th>소개</th>
                     <th width="5%">댓글</th>
                     <th width="10%">작성일</th>
                     <th width="10%">수정일</th>
                     <th width="10%">작업</th>
                 </tr>
-                <tr ng-repeat-start="item in introShops">
+                <tr ng-repeat-start="item in items">
                     <td>{{item.Id}}</td>
                     <td>{{item.Title}}</td>
                     <td>{{item.NickName}}</td>
+                    <td>{{item.EndDate}}</td>
                     <td>{{item.Description}}</td>
                     <td>{{item.Replies.length}}</td>
                     <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
-                    <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
+                    <td>{{item.LastUpdateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
                     <td><a href="#" ng-click="removeItem(item.Id)">삭제</a></td>
                 </tr>
                 <tr ng-repeat-end>
-                    <td colspan="6">
+                    <td colspan="8">
                         <ul class="imagePreview">
                             <li ng-repeat="image in item.Images">
                                 <img ng-src="{{getImageURL(image)}}"/>

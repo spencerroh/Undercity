@@ -9,10 +9,12 @@ $app->group('/intro', function () use ($app) {
         $request = json_decode($app->request->getBody(), true);
 
         if (array_key_exists('Description', $request) &&
-            array_key_exists('Title', $request)) {
+            array_key_exists('Title', $request) &&
+            array_key_exists('NickName', $request)) {
             $intro = new \Undercity\IntroShop();
             $intro->setDescription($request['Description']);
             $intro->setTitle($request['Title']);
+            $intro->setNickName($request['NickName']);
             $intro->setUser($app->user);
             $intro->setCreateDate(new DateTime('now'));
             $intro->setLastUpdateDate(new DateTime('now'));
