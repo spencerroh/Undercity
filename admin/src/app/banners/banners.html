@@ -7,6 +7,9 @@
                 <ul style="list-style-type:none;padding:0px">
                     <li ng-repeat="banner in banners" style="padding:5px 0px;">
                         <img ng-src="{{banner.img}}" style="width:100%">
+                        <div class="pull-right">
+                            <a href="#" ng-click="removeItem(banner.id)">삭제</a>
+                        </div>
                     </li>
                 </ul>
             </div>

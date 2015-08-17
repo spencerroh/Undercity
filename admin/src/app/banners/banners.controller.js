@@ -17,6 +17,7 @@ angular.module('undercity')
                     var img = IMAGE_ENDPOINT + currentValue.ImageId;
 
                     $scope.banners.push({
+                        'id': currentValue.Id,
                         'url': url,
                         'img': img
                     });
@@ -46,4 +47,12 @@ angular.module('undercity')
         };
 
         refreshBanners();
+
+        $scope.removeItem = function (id) {
+            bannerService.delete({
+                id: id
+            }, function () {
+                refreshBanners();
+            });
+        };
     });
