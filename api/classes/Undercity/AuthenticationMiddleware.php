@@ -22,7 +22,7 @@ class AuthenticationMiddleware extends Middleware
         $isOptionsRequest = $app->request->isOptions();
 
         if ($isOptionsRequest) {
-            $app->response->header('Allow', 'GET, POST, DELETE');
+            $app->response->header('Allow', 'OPTIONS, GET, POST, DELETE');
             $app->response->setStatus(200);
             return;
         }

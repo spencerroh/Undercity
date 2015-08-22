@@ -2,7 +2,6 @@
 
 namespace Undercity;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Undercity\Base\Image as BaseImage;
 
 /**
@@ -17,14 +16,13 @@ use Undercity\Base\Image as BaseImage;
  */
 class Image extends BaseImage
 {
-    public function delete(ConnectionInterface $con = null) {
-        $fileName = RESOURCE_PATH.parent::getSource();
-
-        if (file_exists($fileName))
-        {
-            unlink($fileName);
+    public function removeResources() {
+        if (file_exists(RESOURCE_PATH . parent::getSource())) {
+            unlink(RESOURCE_PATH . parent::getSource());
         }
 
-        parent::delete($con);
+        if (file_exists(RESOURCE_PATH . parent::getSourceThumb())) {
+            unlink(RESOURCE_PATH . parent::getSourceThumb());
+        }
     }
 }

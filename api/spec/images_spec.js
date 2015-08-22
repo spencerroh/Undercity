@@ -9,7 +9,7 @@ var USER_API_ENDPOINT = process.env.API_ENDPOINT + 'user/';
 var IMAGES_API_ENDPOINT = process.env.API_ENDPOINT + 'images/';
 
 var testPngPath = path.resolve(__dirname, 'resources/test.png');
-var testJpgPath = path.resolve(__dirname, 'resources/test.jpg');
+var testJpgPath = path.resolve(__dirname, 'resources/test_big.jpg');
 
 var formForCreate = new FormData();
 formForCreate.append('image', fs.createReadStream(testPngPath), {
@@ -39,6 +39,7 @@ frisby.create('Update a image and get a id of image')
         image: Number
     })
     .afterJSON(function (json) {
+        console.log(json.image);
         var imageKey = json.image;
 
         frisby.create('Get a image')

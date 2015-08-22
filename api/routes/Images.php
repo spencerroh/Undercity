@@ -7,8 +7,72 @@
  */
 
 $app->group('/images', function () use ($app) {
-    $app->options('/', function () use ($app) {
-        $app->response->header('Allow', 'GET, POST, DELETE');
+    function showImage($app, $path) {
+        if (file_exists($path)) {
+            $mimeType = mime_content_type($path);
+            if (strpos(ACCEPTABLE_IMAGE_FORMAT, $mimeType) !== false) {
+                $app->response->headers->set('content-type', $mimeType);
+                $app->response->headers->set('content-length', filesize($path));
+
+                fpassthru(fopen($path, 'rb'));
+
+                return;
+            }
+        }
+
+        $mimeType = mime_content_type(NOT_AVAILABLE_PHOTO);
+        $app->response->headers->set('content-type', $mimeType);
+        $app->response->headers->set('content-length', filesize(NOT_AVAILABLE_PHOTO));
+        fpassthru(fopen(NOT_AVAILABLE_PHOTO, 'rb'));
+    }
+
+    function saveImage($app, $file) {
+        $mimeType = mime_content_type($file);
+        if (strpos(ACCEPTABLE_IMAGE_FORMAT, $mimeType) === false) {
+            return false;
+        }
+
+        $filename = uniqid();
+        $thumbnail = uniqid();
+
+        list($w, $h) = getimagesize($file);
+        $ratio = max($w, $h) / IMAGE_MAX_SIZE;
+
+        // 만약 이미지 사이즈가 IMAGE_MAX_SIZE보다 크다면 IMAGE_MAX_SIZE로 이미지 조정
+        if ($ratio > 1) {
+            $image = $app->imageOps[$mimeType]['create']($file);
+            $resampled = imagecreatetruecolor($w/$ratio, $h/$ratio);
+            imagecopyresampled($resampled, $image, 0, 0, 0, 0, $w/$ratio, $h/$ratio, $w, $h);
+            $app->imageOps[$mimeType]['save']($resampled, RESOURCE_PATH . $filename);
+        } else {
+            move_uploaded_file($file, RESOURCE_PATH . $filename);
+        }
+
+        // 썸네일 만들기
+        list($w, $h) = getimagesize(RESOURCE_PATH . $filename);
+        $ratio = max($w, $h) / IMAGE_THUMB_SIZE;
+
+        if ($ratio > 1) {
+            $image = $app->imageOps[$mimeType]['create'](RESOURCE_PATH . $filename);
+            $resampled = imagecreatetruecolor($w/$ratio, $h/$ratio);
+            imagecopyresampled($resampled, $image, 0, 0, 0, 0, $w/$ratio, $h/$ratio, $w, $h);
+            $app->imageOps[$mimeType]['save']($resampled, RESOURCE_PATH . $thumbnail);
+        } else {
+            $thumbnail = $filename;
+        }
+
+        return array($filename, $thumbnail);
+    }
+
+    $app->get('/thumb/:id', function ($id) use ($app) {
+        $image = \Undercity\ImageQuery::create()->findPK($id);
+
+        if ($image != NULL) {
+            $fileName = RESOURCE_PATH . $image->getSourceThumb();
+            showImage($app, $fileName);
+        } else {
+            $app->response->setStatus(404);
+        }
     });
 
     $app->get('/:id', function ($id) use ($app) {
@@ -16,41 +80,36 @@ $app->group('/images', function () use ($app) {
 
         if ($image != NULL) {
             $fileName = RESOURCE_PATH . $image->getSource();
-            $mimeType = mime_content_type($fileName);
-            if (file_exists($fileName) &&
-                strpos($mimeType, 'image') !== false
-            ) {
-                $app->response->headers->set('Content-Type', $mimeType);
-                $app->response->headers->set('Content-Length', filesize($fileName));
-
-                fpassthru(fopen($fileName, 'rb'));
-            } else {
-                $image->delete();
-                $app->response->setStatus(404);
-            }
-
+            showImage($app, $fileName);
         } else {
             $app->response->setStatus(404);
         }
     });
 
-    $app->post('/:id', function ($id) use ($app) {
-        $image = \Undercity\ImageQuery::create()->findPK($id);
+    $app->post('/', function () use ($app) {
+        if (array_key_exists('image', $_FILES)) {
+            if (!is_dir(RESOURCE_PATH)) {
+                mkdir(RESOURCE_PATH);
+            }
 
-        if ($image != NULL) {
             $file = $_FILES['image'];
-            $fileName = uniqid() . '.' . pathinfo($file['name'])['extension'];
 
             if (is_uploaded_file($file['tmp_name'])) {
-                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $fileName);
+                $mimeType = mime_content_type($file['tmp_name']);
 
-                $oldFileName = RESOURCE_PATH . $image->getSource();
-
-                if (file_exists($oldFileName)) {
-                    unlink($oldFileName);
+                if (strpos(ACCEPTABLE_IMAGE_FORMAT, $mimeType) === false) {
+                    $app->response->setStatus(400);
+                    echo json_encode(array(
+                        'error' => 'image format is not supported'
+                    ));
+                    return;
                 }
 
-                $image->setSource($fileName);
+                list($source, $thumb) = saveImage($app, $file['tmp_name']);
+
+                $image = new \Undercity\Image();
+                $image->setSource($source);
+                $image->setSourceThumb($thumb);
                 $image->save();
 
                 $app->response->headers->set('Content-Type', 'application/json');
@@ -66,7 +125,7 @@ $app->group('/images', function () use ($app) {
         }
     });
 
-    $app->post('/', function () use ($app) {
+    $app->post('/:id', function ($id) use ($app) {
         if (array_key_exists('image', $_FILES)) {
             if (!is_dir(RESOURCE_PATH)) {
                 mkdir(RESOURCE_PATH);
@@ -74,15 +133,24 @@ $app->group('/images', function () use ($app) {
 
             $file = $_FILES['image'];
 
-
-            $filename = uniqid();// . '.' . pathinfo($file['name'])['extension'];
-
             if (is_uploaded_file($file['tmp_name'])) {
-                move_uploaded_file($file['tmp_name'], RESOURCE_PATH . $filename);
+                $mimeType = mime_content_type($file['tmp_name']);
 
-                $image = new \Undercity\Image();
-                $image->setSource($filename);
-                $image->setSourceThumb($filename);
+                if (strpos(ACCEPTABLE_IMAGE_FORMAT, $mimeType) === false) {
+                    $app->response->setStatus(400);
+                    echo json_encode(array(
+                        'error' => 'image format is not supported'
+                    ));
+                    return;
+                }
+
+                list($source, $thumb) = saveImage($app, $file['tmp_name']);
+
+                $image = \Undercity\ImageQuery::create()->findPk($id);
+                $image->removeResources();
+
+                $image->setSource($source);
+                $image->setSourceThumb($thumb);
                 $image->save();
 
                 $app->response->headers->set('Content-Type', 'application/json');
@@ -100,13 +168,11 @@ $app->group('/images', function () use ($app) {
 
     $app->delete('/:id', function ($id) use ($app) {
         $image = \Undercity\ImageQuery::create()->findPK($id);
-        echo '1';
         if ($image != NULL) {
+            $image->removeResources();
             $image->delete();
         } else {
             $app->response->setStatus(404);
         }
     });
 });
-
-?>
