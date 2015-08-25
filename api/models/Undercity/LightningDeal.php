@@ -26,7 +26,10 @@ class LightningDeal extends BaseLightningDeal
         }
 
         $arr['Images'] = $images;
-        $arr['Replies'] = $this->getLightningDealReplies()->toArray();
+        $replies = \Undercity\LightningDealReplyQuery::create()->filterByPost($this)
+                                                               ->filterByIsRemoved(false)
+                                                               ->find();
+        $arr['Replies'] = $replies->toArray();
         return $arr;
     }
 }

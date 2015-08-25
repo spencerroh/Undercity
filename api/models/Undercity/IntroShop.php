@@ -26,7 +26,11 @@ class IntroShop extends BaseIntroShop
         }
 
         $arr['Images'] = $images;
-        $arr['Replies'] = $this->getIntroShopReplies()->toArray();
+
+        $replies = \Undercity\IntroShopReplyQuery::create()->filterByPost($this)
+                                                           ->filterByIsRemoved(false)
+                                                           ->find();
+        $arr['Replies'] = $replies->toArray();
         return $arr;
     }
 }

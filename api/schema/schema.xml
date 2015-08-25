@@ -109,11 +109,11 @@
             <reference local="user_id" foreign="id"/>
         </foreign-key>
     </table>
-    <table name="intro_shops_reply" phpName="IntroShopReply">
+    <table name="intro_shops_replies" phpName="IntroShopReply">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
+        <column name="nick_name" type="varchar" size="64" required="true"/>
         <column name="post_id" type="integer" required="true"/>
-        <column name="repl_id" type="integer" required="false"/>
         <column name="description" type="longvarchar" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
         <column name="last_update_date" type="timestamp" required="true"/>
@@ -121,11 +121,8 @@
         <foreign-key foreignTable="users" phpName="User" refPhpName="IntroShopReply">
             <reference local="user_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="intro_shops" phpName="IntroShop" refPhpName="IntroShopReply">
+        <foreign-key foreignTable="intro_shops" phpName="Post" refPhpName="IntroShopReply">
             <reference local="post_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="intro_shops_reply" phpName="ReplyOfReply" refPhpName="IntroShopReply">
-            <reference local="repl_id" foreign="id"/>
         </foreign-key>
     </table>
 
@@ -157,8 +154,8 @@
     <table name="lightning_deal_replies" phpName="LightningDealReply">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
+        <column name="nick_name" type="varchar" size="64" required="true"/>
         <column name="post_id" type="integer" required="true"/>
-        <column name="repl_id" type="integer" required="false"/>
         <column name="description" type="longvarchar" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
         <column name="last_update_date" type="timestamp" required="true"/>
@@ -166,11 +163,8 @@
         <foreign-key foreignTable="users" phpName="User" refPhpName="LightningDealReply">
             <reference local="user_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="lightning_deals" phpName="LightningDeal" refPhpName="LightningDealReply">
+        <foreign-key foreignTable="lightning_deals" phpName="Post" refPhpName="LightningDealReply">
             <reference local="post_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="lightning_deal_replies" phpName="ReplyOfReply" refPhpName="LightningDealReply">
-            <reference local="repl_id" foreign="id"/>
         </foreign-key>
     </table>
 

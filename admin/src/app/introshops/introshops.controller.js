@@ -1,9 +1,10 @@
 /*jslint browser: true*/
 /*global angular*/
 angular.module('undercity')
-    .controller('IntroShopsCtrl', function ($scope, $q, imageService, introShopService, IMAGE_ENDPOINT) {
+    .controller('IntroShopsCtrl', function ($scope, $q, imageService, introShopService, introShopReplyService, IMAGE_ENDPOINT) {
         'use strict';
         $scope.intro = {};
+        $scope.reply = {};
         $scope.imageSrc = IMAGE_ENDPOINT;
 
         function refreshIntroShop() {
@@ -53,5 +54,38 @@ angular.module('undercity')
 
         $scope.getImageURL = function (imageId) {
             return IMAGE_ENDPOINT + imageId;
+        };
+
+        $scope.submitReply = function (id) {
+            if ('Id' in $scope.reply) {
+                introShopReplyService.modify({
+                    id: $scope.reply.Id
+                }, $scope.reply, function () {
+                    refreshIntroShop();
+                });
+            } else {
+                introShopReplyService.create({
+                    id: id
+                }, $scope.reply, function () {
+                    refreshIntroShop();
+                });
+            }
+
+        };
+
+        $scope.removeReply = function (id) {
+            introShopReplyService.delete({
+                id: id
+            }, function () {
+                refreshIntroShop();
+            })
+        };
+
+        $scope.setReply = function (reply) {
+            $scope.reply = reply;
+        };
+
+        $scope.clearReply = function () {
+            $scope.reply = {};
         };
     });

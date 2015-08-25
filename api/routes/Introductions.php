@@ -3,6 +3,9 @@
  * User: spencer.roh@gmail.com
  * Date: 2015-08-10
  */
+use \Undercity\IntroShopQuery as ItemQuery;
+use \Undercity\IntroShopReply as Reply;
+use \Undercity\IntroShopReplyQuery as ReplyQuery;
 
 $app->group('/intro', function () use ($app) {
     $app->post('/', function () use ($app) {
@@ -94,20 +97,67 @@ $app->group('/intro', function () use ($app) {
         }
     });
 
-    $app->get('/:id/reply', function ($id) use ($app) {
-
+    $app->get('/reply/:id', function ($id) use ($app) {
+        $replies = ReplyQuery::create()->filterByPostId($id)
+                                       ->filterByIsRemoved(false)
+                                       ->find();
+        echo json_encode($replies->toArray(), true);
     });
 
-    $app->post('/:id/reply', function ($id) use ($app) {
+    $app->post('/reply/:id', function ($id) use ($app) {
+        $request = json_decode($app->request->getBody(), true);
 
+        if (array_key_exists('Description', $request) &&
+            array_key_exists('NickName', $request)) {
+            $post = ItemQuery::create()->findPk($id);
+
+            if ($post)
+            {
+                $reply = new Reply();
+                $reply->setUser($app->user);
+                $reply->setNickName($request['NickName']);
+                $reply->setPost($post);
+                $reply->setDescription($request['Description']);
+                $reply->setCreateDate(new DateTime('now'));
+                $reply->setLastUpdateDate(new DateTime('now'));
+                $reply->setIsRemoved(false);
+                $reply->save();
+            }
+            else
+            {
+                $app->response->setStatus(404);
+            }
+        } else {
+            $app->response->setStatus(400);
+        }
     });
 
-    $app->put('/:id/reply/:rid', function($id, $rid) use ($app) {
+    $app->put('/reply/:rid', function($rid) use ($app) {
+        $request = json_decode($app->request->getBody(), true);
+        $reply = ReplyQuery::create()->findPk($rid);
 
+        if ($reply) {
+            if (array_key_exists('Description', $request)) {
+                $reply->setDescription($request['Description']);
+            }
+            if (array_key_exists('NickName', $request)) {
+                $reply->setNickName($request['NickName']);
+            }
+            $reply->setLastUpdateDate(new DateTime('now'));
+            $reply->save();
+        } else {
+            $app->response->setStatus(404);
+        }
     });
 
-    $app->delete('/:id/reply/:rid', function($id, $rid) use ($app) {
-
+    $app->delete('/reply/:rid', function($rid) use ($app) {
+        $reply = ReplyQuery::create()->findPk($rid);
+        if ($reply) {
+            $reply->setIsRemoved(true);
+            $reply->save();
+        } else {
+            $app->response->setStatus(404);
+        }
     });
 
     $app->get('/:id:/images/', function ($id) use ($app) {

@@ -50,9 +50,39 @@
                     <td>{{item.NickName}}</td>
                     <td>{{item.Description}}</td>
                     <td>{{item.Replies.length}}</td>
-                    <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
-                    <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss a'}}</td>
+                    <td>{{item.CreateDate | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+                    <td>{{item.LastUpdateDate | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
                     <td><a href="#" ng-click="removeItem(item.Id)">삭제</a></td>
+                </tr>
+                <tr>
+                    <td colspan="7" class="form-inline">
+                        <table class="table">
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="20%">닉네임</th>
+                                <th>댓글</th>
+                                <th width="10%">작업</th>
+                            </tr>
+                            <tr ng-repeat="r in item.Replies" ng-click="setReply(r)">
+                                <td>{{r.Id}}</td>
+                                <td>{{r.NickName}}</td>
+                                <td>{{r.Description}}</td>
+                                <td><a href="#" ng-click="removeReply(r.Id)">삭제</a></td>
+                            </tr>
+                        </table>
+                        <div class="form-group">
+                            <label class="sr-only" for="rpNickName">닉네임</label>
+                            <input type="text" class="form-control" id="rpNickName" placeholder="닉네임" ng-model="reply.NickName" ng-minlength="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="rpDescription">댓글</label>
+                            <input type="text" class="form-control" id="rpDescription" placeholder="댓글" ng-model="reply.Description" ng-minlength="1">
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-success" ng-click="submitReply(item.Id)">확인</button>
+                            <button type="button" class="btn btn-danger" ng-click="clearReply()">취소</button>
+                        </div>
+                    </td>
                 </tr>
                 <tr ng-repeat-end>
                     <td colspan="7">

@@ -3,16 +3,17 @@
  */
 
 angular.module('undercity')
-    .controller('LightningDealCtrl', function ($scope, $q, imageService, IMAGE_ENDPOINT, lightningDealService) {
+    .controller('LightningDealCtrl', function ($scope, $q, imageService, IMAGE_ENDPOINT, lightningDealService, lightningDealReplyService) {
         'use strict';
 
         var service = lightningDealService;
         $scope.item = {
             Title: '이것은 샘플입니다',
             NickName: '관리자',
-            EndDate: new Date('2015-08-15T12:57:00'),
+            EndDate: new Date(Date.now()),
             Description: '날마다 오는 딜이 아닙니다'
         };
+        $scope.reply = {};
         $scope.items = [];
 
         function refreshItems() {
@@ -62,5 +63,38 @@ angular.module('undercity')
 
         $scope.getImageURL = function (imageId) {
             return IMAGE_ENDPOINT + imageId;
+        };
+
+        $scope.submitReply = function (id) {
+            if ('Id' in $scope.reply) {
+                lightningDealReplyService.modify({
+                    id: $scope.reply.Id
+                }, $scope.reply, function () {
+                    refreshItems();
+                });
+            } else {
+                lightningDealReplyService.create({
+                    id: id
+                }, $scope.reply, function () {
+                    refreshItems();
+                });
+            }
+
+        };
+
+        $scope.removeReply = function (id) {
+            lightningDealReplyService.delete({
+                id: id
+            }, function () {
+                refreshItems();
+            })
+        };
+
+        $scope.setReply = function (reply) {
+            $scope.reply = reply;
+        };
+
+        $scope.clearReply = function () {
+            $scope.reply = {};
         };
     });
