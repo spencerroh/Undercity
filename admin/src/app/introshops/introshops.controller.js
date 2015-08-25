@@ -78,7 +78,7 @@ angular.module('undercity')
                 id: id
             }, function () {
                 refreshIntroShop();
-            })
+            });
         };
 
         $scope.setReply = function (reply) {

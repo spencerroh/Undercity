@@ -87,7 +87,7 @@ angular.module('undercity')
                 id: id
             }, function () {
                 refreshItems();
-            })
+            });
         };
 
         $scope.setReply = function (reply) {
