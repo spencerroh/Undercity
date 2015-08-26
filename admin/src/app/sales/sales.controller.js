@@ -3,7 +3,7 @@
  */
 /*global angular*/
 angular.module('undercity')
-    .controller('SalesCtrl', function ($scope, imageService, $q, saleService, IMAGE_ENDPOINT) {
+    .controller('SalesCtrl', function ($scope, imageService, $q, saleService, IMAGE_ENDPOINT, bookmarkSaleService) {
         'use strict';
         $scope.sale = {
             Name: '하모니마트',
@@ -63,4 +63,12 @@ angular.module('undercity')
         };
 
         refreshSaleEvents();
+
+        $scope.bookmarkItem = function (id) {
+            bookmarkSaleService.create({
+                id: id
+            }, {}, function () {
+                refreshSaleEvents();
+            });
+        };
     });

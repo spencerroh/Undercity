@@ -1,7 +1,7 @@
 /*jslint browser: true*/
 /*global angular*/
 angular.module('undercity')
-    .controller('StoresCtrl', function ($scope, imageService, $q, IMAGE_ENDPOINT, storeService) {
+    .controller('StoresCtrl', function ($scope, imageService, $q, IMAGE_ENDPOINT, storeService, bookmarkStoreService) {
         'use strict';
 
         var service = storeService;
@@ -62,5 +62,13 @@ angular.module('undercity')
 
         $scope.getImageURL = function (imageId) {
             return IMAGE_ENDPOINT + imageId;
+        };
+
+        $scope.bookmarkItem = function (id) {
+            bookmarkStoreService.create({
+                id: id
+            }, {}, function () {
+                refreshItems();
+            });
         };
     });

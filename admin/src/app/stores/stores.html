@@ -67,7 +67,10 @@
                     <td>{{item.Contact}}</td>
                     <td>{{item.Product}}</td>
                     <td>{{item.GPS}}</td>
-                    <td><a href="#" ng-click="removeItem(item.Id)">삭제</a></td>
+                    <td>
+                        <a href="#" ng-click="removeItem(item.Id)">삭제</a>
+                        <a href="#" ng-click="bookmarkItem(item.Id)">찜</a>
+                    </td>
                 </tr>
                 <tr ng-repeat-end>
                     <td colspan="7">
