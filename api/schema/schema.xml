@@ -179,4 +179,28 @@
             <reference local="image_id" foreign="id"/>
         </foreign-key>
     </table>
+
+    <table  name="shop_bookmarks" phpName="ShopBookmark">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true"/>
+        <column name="shop_id" type="integer" required="true"/>
+        <foreign-key foreignTable="users" phpName="User" refPhpName="ShopBookmark">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="stores" phpName="Shop" refPhpName="ShopBookmark">
+            <reference local="shop_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <table  name="sale_bookmarks" phpName="SaleBookmark">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true"/>
+        <column name="sale_id" type="integer" required="true"/>
+        <foreign-key foreignTable="users" phpName="User" refPhpName="SaleBookmark">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="sales" phpName="Sale" refPhpName="SaleBookmark">
+            <reference local="sale_id" foreign="id" />
+        </foreign-key>
+    </table>
 </database>
