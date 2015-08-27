@@ -10,15 +10,12 @@ class AuthenticationMiddleware extends Middleware
     public function call()
     {
         $app = $this->app;
-        $auth = $app->auth;
 
         $path = $app->request->getPath();
         $isLoginRequest = preg_match("/user/i", $path);
         $isImageRequest = preg_match("/images/i", $path) && $app->request->isGet();
-        $hasDeviceID = true;
-        $deviceID = 'ADMIN_DEVICE_UUID';
-        //$hasDeviceID = $app->request->headers->has('X-Device-Id');
-        //$deviceID = $app->request->headers->get('X-Device-Id');
+        $hasDeviceID = $app->request->headers->has('X-Device-Id');
+        $deviceID = $app->request->headers->get('X-Device-Id');
         $isOptionsRequest = $app->request->isOptions();
 
         if ($isOptionsRequest) {

@@ -4,6 +4,7 @@ namespace Undercity;
 
 use Undercity\Base\Store as BaseStore;
 use Propel\Runtime\Map\TableMap;
+use Undercity\ShopBookmarkQuery as BookmarkQuery;
 
 /**
  * Skeleton subclass for representing a row from the 'stores' table.
@@ -26,6 +27,9 @@ class Store extends BaseStore
         }
 
         $arr['Images'] = $images;
+
+        $arr['BookmarkCount'] = BookmarkQuery::create()->findByShopId($this->getId())->count();
+
         return $arr;
     }
 }

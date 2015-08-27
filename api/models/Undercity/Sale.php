@@ -4,6 +4,7 @@ namespace Undercity;
 
 use Undercity\Base\Sale as BaseSale;
 use Propel\Runtime\Map\TableMap;
+use Undercity\SaleBookmarkQuery as BookmarkQuery;
 
 /**
  * Skeleton subclass for representing a row from the 'sales' table.
@@ -50,6 +51,7 @@ class Sale extends BaseSale
         }
 
         $arr['Images'] = $images;
+        $arr['BookmarkCount'] = BookmarkQuery::create()->findBySaleId($this->getId())->count();
         return $arr;
     }
 }
