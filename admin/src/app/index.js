@@ -1,10 +1,6 @@
 'use strict';
 
-angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngResource', 'ui.router', 'ui.bootstrap', 'ngFileUpload'])
-    //.constant('SERVICE_ENDPOINT', 'http://localhost/undercity/api')
-    //.constant('IMAGE_ENDPOINT', 'http://localhost/undercity/api/images/')
-    .constant('SERVICE_ENDPOINT', 'http://222.122.143.163/undercity/api')
-    .constant('IMAGE_ENDPOINT', 'http://222.122.143.163/undercity/api/images/')
+angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngResource', 'ui.router', 'ui.bootstrap', 'ngFileUpload', 'http-auth-interceptor'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('home', {
@@ -51,5 +47,5 @@ angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 
         $urlRouterProvider.otherwise('/');
     })
     .run(function ($http) {
-        $http.defaults.headers.common['X-Device-Id'] = 'ADMIN_DEVICE_UUID';
+
     });
