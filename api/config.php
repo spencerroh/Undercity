@@ -14,3 +14,7 @@ define('IMAGE_THUMB_SIZE', 512);
 define('ACCEPTABLE_IMAGE_FORMAT', 'image/png;image/jpeg;');
 // 이미지 파일이 깨진 경우 보여줄 이미지 경로
 define('NOT_AVAILABLE_PHOTO', 'statics/photo_not_available.jpg');
+// 수신된 로그인 데이터의 만료시간
+define('LOGIN_DATA_EXPIRE_SECONDS', 60);
+// JWT Token Secret Key
+define('JWT_TOKEN_SECRET_KEY', 'undercity');

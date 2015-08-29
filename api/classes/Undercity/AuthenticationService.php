@@ -31,13 +31,7 @@ class AuthenticationService
         $user->setLastLoginDate(new DateTime('now'));
         $user->save();
 
-        $this->user = $user;
-
-        $response = array(
-            'status' => 'success'
-        );
-
-        echo json_encode($response);
+        return $user;
     }
 
     public function getUser()

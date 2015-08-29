@@ -29,7 +29,7 @@ $app->imageOps = array(
 // CORS settings
 $app->response->header('Access-Control-Allow-Origin', '*');
 $app->response->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-$app->response->header('Access-Control-Allow-Headers', 'Content-Type, X-Device-ID');
+$app->response->header('Access-Control-Allow-Headers', 'Content-Type, X-Token');
 
 function keyExists($keys, $array) {
     $isAllExists = true;
