@@ -58,7 +58,8 @@
         <column name="contact" type="varchar" size="255" required="true"/>
         <column name="product" type="varchar" size="255" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
-        <column name="gps" type="varchar" size="64" required="true" phpName="GPS"/>
+        <column name="latitude" type="double" required="true"/>
+        <column name="longitude" type="double" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
     </table>
     <table name="store_images" phpName="StoreImage">
@@ -83,7 +84,8 @@
         <column name="event_from" type="date" required="true"/>
         <column name="event_to" type="date" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
-        <column name="gps" type="varchar" size="64" required="true" phpName="GPS"/>
+        <column name="latitude" type="double" required="true"/>
+        <column name="longitude" type="double" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
     </table>
     <table name="sale_images" phpName="SaleImages">

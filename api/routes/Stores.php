@@ -8,7 +8,7 @@ $app->group('/store', function () use ($app) {
     $app->post('/', function() use ($app) {
         $request = json_decode($app->request->getBody(), true);
 
-        if (keyExists(array('Name', 'Address', 'Contact', 'Product', 'Description', 'GPS', 'Images'), $request)) {
+        if (keyExists(array('Name', 'Address', 'Contact', 'Product', 'Description', 'Latitude', 'Longitude'), $request)) {
             $store = new \Undercity\Store();
 
             $store->setName($request['Name']);
@@ -16,14 +16,17 @@ $app->group('/store', function () use ($app) {
             $store->setContact($request['Contact']);
             $store->setProduct($request['Product']);
             $store->setDescription($request['Description']);
-            $store->setGPS($request['GPS']);
+            $store->setLatitude($request['Latitude']);
+            $store->setLongitude($request['Longitude']);
 
             $store->setCreateDate(new DateTime('now'));
 
-            foreach($request['Images'] as $imageId) {
-                $storeImage = new \Undercity\StoreImage();
-                $storeImage->setImageId($imageId);
-                $store->addStoreImage($storeImage);
+            if (array_key_exists('Images', $request)) {
+                foreach($request['Images'] as $imageId) {
+                    $storeImage = new \Undercity\StoreImage();
+                    $storeImage->setImageId($imageId);
+                    $store->addStoreImage($storeImage);
+                }
             }
 
             $store->save();

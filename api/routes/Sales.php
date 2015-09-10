@@ -18,8 +18,8 @@ $app->group('/sales', function () use ($app) {
             array_key_exists('EventFrom', $request) &&
             array_key_exists('EventTo', $request) &&
             array_key_exists('Description', $request) &&
-            array_key_exists('GPS', $request) &&
-            preg_match('/[0-9]+,[0-9]+/', $request['GPS'])) {
+            array_key_exists('Latitude', $request) &&
+            array_key_exists('Longitude', $request)) {
             $sale->setName($request['Name']);
             $sale->setAddress($request['Address']);
             $sale->setContact($request['Contact']);
@@ -27,7 +27,8 @@ $app->group('/sales', function () use ($app) {
             $sale->setEventFrom(new DateTime($request['EventFrom']));
             $sale->setEventTo(new DateTime($request['EventTo']));
             $sale->setDescription($request['Description']);
-            $sale->setGPS($request['GPS']);
+            $sale->setLatitude($request['Latitude']);
+            $sale->setLongitude($request['Longitude']);
             $sale->setCreateDate(new DateTime('now'));
             $sale->save();
 
@@ -64,6 +65,7 @@ $app->group('/sales', function () use ($app) {
 
             echo json_encode($response);
         } else {
+            var_dump($request);
             $app->response->setStatus(400);
         }
     });
@@ -102,11 +104,13 @@ $app->group('/sales', function () use ($app) {
             if (array_key_exists('Description', $request)) {
                 $sale->setDescription($request['Description']);
             }
-
-            if (array_key_exists('GPS', $request) &&
-                preg_match('/[0-9]+,[0-9]+/', $request['GPS'])
-            ) {
-                $sale->setGPS($request['GPS']);
+            
+            if (array_key_exists('Latitude', $request)) {
+                $sale->setLatitude($request['Latitude']);    
+            }
+            
+            if (array_key_exists('Longitude', $request)) {
+                $sale->setLongitude($request['Longitude']);    
             }
 
             $sale->save();

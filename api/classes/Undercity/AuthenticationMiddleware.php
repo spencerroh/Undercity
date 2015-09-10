@@ -16,6 +16,7 @@ class AuthenticationMiddleware extends Middleware
         $isLoginRequest = preg_match("/user/i", $path);
         $isImageRequest = preg_match("/images/i", $path) && $app->request->isGet();
         $isCertRequest = preg_match("/cert/i", $path);
+        $isTestRequest = preg_match("/test/i", $path);
         $isOptionsRequest = $app->request->isOptions();
 
         /*
@@ -29,7 +30,7 @@ class AuthenticationMiddleware extends Middleware
             if ($isOptionsRequest) {
                 $app->response->header('Allow', 'OPTIONS, GET, POST, DELETE');
                 $app->response->setStatus(200);
-            } else if ($isLoginRequest || $isImageRequest || $isCertRequest) {
+            } else if ($isLoginRequest || $isImageRequest || $isCertRequest || $isTestRequest) {
                 $this->next->call();
             } else {
                 $app->response->setStatus(401);
