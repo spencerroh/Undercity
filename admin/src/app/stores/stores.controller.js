@@ -31,6 +31,11 @@ angular.module('undercity')
         };
 
         $scope.submitInputs = function () {
+            console.log($scope.item.GPS);
+            var gps = $scope.item.GPS.split(',');
+            $scope.item.Latitude = gps[0].trim();
+            $scope.item.Longitude = gps[1].trim();
+            
             if ($scope.itemImages !== undefined) {
                 var $imageKey = [];
                 var $imagePromise = [];
@@ -48,6 +53,10 @@ angular.module('undercity')
                     service.create($scope.item, function () {
                         refreshItems();
                     });
+                });
+            } else {
+                service.create($scope.item, function () {
+                    refreshItems();
                 });
             }
         };

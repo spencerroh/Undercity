@@ -30,6 +30,10 @@ angular.module('undercity')
         };
 
         $scope.submitCurrentSale = function () {
+            var gps = $scope.sale.GPS.split(',');
+            $scope.sale.Latitude = gps[0].trim();
+            $scope.sale.Longitude = gps[1].trim();
+            
             if ($scope.saleImages !== undefined) {
                 var $imageKey = [];
                 var $imagePromise = [];
@@ -46,6 +50,11 @@ angular.module('undercity')
                     saleService.create($scope.sale, function () {
                         refreshSaleEvents();
                     });
+                });
+            } else {
+                
+                saleService.create($scope.sale, function () {
+                        refreshSaleEvents();
                 });
             }
         };
