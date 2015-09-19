@@ -51,20 +51,23 @@
             <reference local="image_id" foreign="id"/>
         </foreign-key>
     </table>
+    <table name="product_types" phpName="ProductType">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="type" type="varchar" size="255" required="true"/>
+    </table>
     <table name="stores" phpName="Store">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true"/>
         <column name="address" type="varchar" size="255" required="true"/>
         <column name="contact" type="varchar" size="255" required="true"/>
-        <column name="product" type="varchar" size="255" required="true"/>
+        <column name="product_id" type="integer" required="true"/>
         <column name="description" type="longvarchar" required="true"/>
         <column name="latitude" type="double" required="true"/>
         <column name="longitude" type="double" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
-    </table>
-    <table name="product_types" phpName="ProductType">
-        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="type" type="varchar" size="255" required="true"/>
+        <foreign-key foreignTable="product_types" phpName="ProductType" refPhpName="Store">
+            <reference local="product_id" foreign="id"/>
+        </foreign-key>
     </table>
     <table name="store_images" phpName="StoreImage">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>

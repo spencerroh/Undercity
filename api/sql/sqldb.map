@@ -1,2 +1,3 @@
 # Sqlfile -> Database map
 default.sql=default
+DISTANCE.sql=default

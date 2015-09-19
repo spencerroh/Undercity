@@ -20,9 +20,11 @@
             </div>
             <div class="form-group">
                 <label for="storeProduct">품목</label>
-                <input type="text" class="form-control" id="storeProduct" placeholder="주로 취급하는 상품"
-                       ng-model="item.Product" ng-minlength="1">
+                <select id="storeProduct" class="form-control" ng-model="item.ProductId">
+                    <option ng-repeat="type in productType" value="{{type.Id}}">{{type.Type}}</option>
+                </select>
             </div>
+
             <div class="form-group">
                 <label for="storeGPS">GPS</label>
                 <input type="text" class="form-control" id="storeGPS" placeholder="XXX, YYY" ng-model="item.GPS"

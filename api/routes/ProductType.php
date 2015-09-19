@@ -36,7 +36,12 @@ $app->group('/product', function () use ($app) {
         if ($item == null) {
             $app->response->setStatus(404);
         } else {
-            $item->delete();
+            try {
+                $item->delete();
+            } catch (Exception $e) {
+                $app->response->setStatus(400);
+            }
+
         }
     });
 });

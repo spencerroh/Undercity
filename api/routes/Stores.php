@@ -3,18 +3,20 @@
  * User: spencer.roh@gmail.com
  * Date: 2015-08-10
  */
+use Propel\Runtime\Propel;
+use Propel\Runtime\Formatter\ObjectFormatter;
 
 $app->group('/store', function () use ($app) {
     $app->post('/', function() use ($app) {
         $request = json_decode($app->request->getBody(), true);
 
-        if (keyExists(array('Name', 'Address', 'Contact', 'Product', 'Description', 'Latitude', 'Longitude'), $request)) {
+        if (keyExists(array('Name', 'Address', 'Contact', 'ProductId', 'Description', 'Latitude', 'Longitude'), $request)) {
             $store = new \Undercity\Store();
 
             $store->setName($request['Name']);
             $store->setAddress($request['Address']);
             $store->setContact($request['Contact']);
-            $store->setProduct($request['Product']);
+            $store->setProductId($request['ProductId']);
             $store->setDescription($request['Description']);
             $store->setLatitude($request['Latitude']);
             $store->setLongitude($request['Longitude']);
@@ -29,9 +31,12 @@ $app->group('/store', function () use ($app) {
                 }
             }
 
-            $store->save();
-            $store->toArray();
-            //echo json_encode(, true);
+            try {
+                $store->save();
+                $store->toArray();
+            } catch (Exception $e) {
+                $app->response->setStatus(400);
+            }
         } else {
             $app->response->setStatus(400);
         }
@@ -43,6 +48,15 @@ $app->group('/store', function () use ($app) {
         if ($shop != null) {
             echo json_encode($shop->toArray(), true);
         }
+    });
+
+    $app->get('/type/:type/gps/:latitude/:longitude', function ($type, $latitude, $longitude) use ($app) {
+        $shops =
+        \Undercity\StoreQuery::create()->withColumn('DISTANCE(latitude, longitude, '.$latitude.', '.$longitude.', "km")', 'Distance')
+                                       ->orderBy('Distance')
+                                       ->findByProductId($type);
+
+        echo json_encode($shops->toArray(), true);
     });
 
     $app->get('/:from/:count', function ($from, $count) use ($app) {

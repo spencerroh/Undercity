@@ -27,7 +27,7 @@ class Store extends BaseStore
         }
 
         $arr['Images'] = $images;
-
+        $arr['Product'] = $this->getProductType()->getType();
         $arr['BookmarkCount'] = BookmarkQuery::create()->findByShopId($this->getId())->count();
 
         return $arr;

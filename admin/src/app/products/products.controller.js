@@ -28,6 +28,8 @@ angular.module('undercity')
                     refreshItems();
                 });
             }
+
+            $scope.product = {};
         };
 
         $scope.deleteItem = function (id) {

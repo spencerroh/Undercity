@@ -1,7 +1,7 @@
 /*jslint browser: true*/
 /*global angular*/
 angular.module('undercity')
-    .controller('StoresCtrl', function ($scope, imageService, $q, IMAGE_ENDPOINT, storeService, bookmarkStoreService) {
+    .controller('StoresCtrl', function ($scope, imageService, $q, IMAGE_ENDPOINT, storeService, bookmarkStoreService, productTypeService) {
         'use strict';
 
         var service = storeService;
@@ -22,8 +22,17 @@ angular.module('undercity')
                 $scope.items = data;
             });
         }
-
         refreshItems();
+
+        //$scope.productType = [];
+        function getProductType() {
+            productTypeService.read(function (data) {
+                $scope.productType = data;
+            })
+        }
+        getProductType();
+
+
 
         $scope.removeInputs = function () {
             $scope.item = {};
@@ -31,7 +40,6 @@ angular.module('undercity')
         };
 
         $scope.submitInputs = function () {
-            console.log($scope.item.GPS);
             var gps = $scope.item.GPS.split(',');
             $scope.item.Latitude = gps[0].trim();
             $scope.item.Longitude = gps[1].trim();
