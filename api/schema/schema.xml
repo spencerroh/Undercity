@@ -62,6 +62,10 @@
         <column name="longitude" type="double" required="true"/>
         <column name="create_date" type="timestamp" required="true"/>
     </table>
+    <table name="product_types" phpName="ProductType">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="type" type="varchar" size="255" required="true"/>
+    </table>
     <table name="store_images" phpName="StoreImage">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="store_id" type="integer" required="true"/>

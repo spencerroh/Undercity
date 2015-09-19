@@ -1,0 +1,31 @@
+<div class="panel panel-default">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="section">
+                <span class="title" >품목</span>
+                <div class="adminInputForm">
+                    <ul style="list-style-type:none;padding:0px">
+                        <li style="padding:5px 5px;margin:1px" ng-repeat="item in items">
+                            <span>{{item.Type}}(<a href="#" ng-click="modifyItem(item)">수정</a>)(<a href="#" ng-click="deleteItem(item.Id)">삭제</a>)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="section">
+                <span class="title">품목 만들기</span>
+                <div class="adminInputForm">
+                    <div class="form-group">
+                        <label for="productType" class="control-label">품목명</label>
+                        <input id="productType" type="text" class="form-control" placeholder="정육, 잡화, 식당...." ng-model="product.Type">
+                    </div>
+                    <div class="form-group clearfix">
+                        <button type="submit" class="btn btn-danger pull-left" ng-click="onCancel()">취소</button>
+                        <button type="submit" class="btn btn-default pull-right" ng-click="onSubmit()">{{submit}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

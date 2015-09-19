@@ -2,7 +2,7 @@
  * Created by Spencer Roh on 2015-08-29.
  */
 angular.module('undercity').directive('auth', function (authenticationService, $http, certService, authService) {
-    var failed = 0;
+    'use strict';
     return {
         restrict: 'C',
         link: function (scope) {

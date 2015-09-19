@@ -42,10 +42,15 @@ angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 
                 url: 'bookmarks',
                 templateUrl: 'app/bookmarks/bookmarks.html',
                 controller: 'BookmarksCtrl'
+            })
+            .state('home.products', {
+                url: 'products',
+                templateUrl: 'app/products/products.html',
+                controller: 'ProductCtrl'
             });
 
         $urlRouterProvider.otherwise('/');
     })
-    .run(function ($http) {
+    .run(function () {
 
     });
