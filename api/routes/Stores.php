@@ -51,10 +51,14 @@ $app->group('/store', function () use ($app) {
     });
 
     $app->get('/type/:type/gps/:latitude/:longitude', function ($type, $latitude, $longitude) use ($app) {
-        $shops =
+        $shopsQuery =
         \Undercity\StoreQuery::create()->withColumn('DISTANCE(latitude, longitude, '.$latitude.', '.$longitude.', "km")', 'Distance')
-                                       ->orderBy('Distance')
-                                       ->findByProductId($type);
+                                       ->orderBy('Distance');
+
+        if ($type != -1)
+            $shops = $shopsQuery->findByProductId($type);
+        else
+            $shops = $shopsQuery->find();
 
         echo json_encode($shops->toArray(), true);
     });
