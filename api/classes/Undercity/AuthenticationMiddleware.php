@@ -5,6 +5,7 @@ namespace Undercity;
 use \Slim\Middleware as Middleware;
 use \Undercity\UserQuery as UserQuery;
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\ExpiredException;
 
 class AuthenticationMiddleware extends Middleware
 {
@@ -19,14 +20,8 @@ class AuthenticationMiddleware extends Middleware
         $isTestRequest = preg_match("/test/i", $path);
         $isOptionsRequest = $app->request->isOptions();
 
-        /*
-        if ($app->request->getIp() == "127.0.0.1") {
-            $isLoginRequest = false;
-        }
-        */
-
         $hasToken = $app->request->headers->has('X-Token');
-        if (!$hasToken) {
+        if ($isLoginRequest || !$hasToken) {
             if ($isOptionsRequest) {
                 $app->response->header('Allow', 'OPTIONS, GET, POST, DELETE');
                 $app->response->setStatus(200);
@@ -45,7 +40,8 @@ class AuthenticationMiddleware extends Middleware
                 $app->user = \Undercity\UserQuery::create()->findPk($userId);
 
                 $this->next->call();
-            } catch(Exception $e) {
+            } catch(ExpiredException $e) {
+                echo $e->getMessage();
                 $app->response->setStatus(401);
             }
 

@@ -8,6 +8,8 @@ angular.module('undercity').directive('auth', function (authenticationService, $
         link: function (scope) {
             scope.$on('event:auth-loginRequired', function () {
                 console.log('login required');
+                delete $http.defaults.headers.common['X-Token'];
+
                 certService.then(function (response) {
                     var publicKey = response.data;
                     var now = new Date();
@@ -28,14 +30,16 @@ angular.module('undercity').directive('auth', function (authenticationService, $
                         'Login': encrypted
                     }, function (response) {
                         $http.defaults.headers.common['X-Token'] = response.token;
-                        authService.loginConfirmed();
+                        authService.loginConfirmed(response.token, function (config) {
+                            config.headers['X-Token'] = response.token;
+                            return config;
+                        });
+                        console.log('login success');
                     }, function (error) {
                         console.log('login failed', error);
+                        delete $http.defaults.headers.common['X-Token'];
                     });
                 });
-            });
-            scope.$on('event:auth-loginConfirmed', function () {
-                console.log('login success');
             });
         }
     };
