@@ -26,18 +26,25 @@ angular.module('undercity')
                 var $imagePromise = [];
                 $scope.introImages.forEach(function (data) {
                     $imagePromise.push(
-                        imageService.create(data).success(function (data) {
-                            $imageKey.push(data.image);
-                        })
+                        imageService.create(data)
                     );
                 });
 
-                $q.all($imagePromise).then(function () {
+                $q.all($imagePromise).then(function (data) {
+                    data.forEach(function (obj) {
+                        $imageKey.push(obj.data.image);
+                    });
                     $scope.intro.Images = $imageKey;
 
                     introShopService.create($scope.intro, function () {
                         refreshIntroShop();
+                        $scope.removeCurrentIntro();
                     });
+                });
+            } else {
+                introShopService.create($scope.intro, function () {
+                    refreshIntroShop();
+                    $scope.removeCurrentIntro();
                 });
             }
         };
