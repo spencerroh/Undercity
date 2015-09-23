@@ -49,22 +49,25 @@ angular.module('undercity')
                 var $imagePromise = [];
                 $scope.itemImages.forEach(function (data) {
                     $imagePromise.push(
-                        imageService.create(data).success(function (data) {
-                            $imageKey.push(data.image);
-                        })
+                        imageService.create(data)
                     );
                 });
 
-                $q.all($imagePromise).then(function () {
+                $q.all($imagePromise).then(function (data) {
+                    data.forEach(function (obj) {
+                        $imageKey.push(obj.data.image);
+                    });
                     $scope.item.Images = $imageKey;
 
                     service.create($scope.item, function () {
                         refreshItems();
+                        $scope.removeInputs();
                     });
                 });
             } else {
                 service.create($scope.item, function () {
                     refreshItems();
+                    $scope.removeInputs();
                 });
             }
         };
