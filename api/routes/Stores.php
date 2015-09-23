@@ -52,13 +52,13 @@ $app->group('/store', function () use ($app) {
 
     $app->get('/type/:type/gps/:latitude/:longitude/filter/:from/:count', function ($type, $latitude, $longitude, $from, $count) use ($app) {
         $shopsQuery =
-        \Undercity\StoreQuery::create()->withColumn('DISTANCE(latitude, longitude, '.$latitude.', '.$longitude.', "km")', 'Distance')
+        \Undercity\StoreQuery::create('store')->withColumn('DISTANCE(latitude, longitude, '.$latitude.', '.$longitude.', "km")', 'Distance')
                                        ->orderBy('Distance')
                                        ->offset($from)
                                        ->limit($count);
 
         if ($type != -1)
-            $shopsQuery = $shopsQuery->where('ProductId = ?', $type);
+            $shopsQuery = $shopsQuery->where('store.product_id = ?', $type);
 
         $shops = $shopsQuery->find();
         echo json_encode($shops->toArray(), true);
