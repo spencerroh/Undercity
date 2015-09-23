@@ -18,3 +18,7 @@ define('NOT_AVAILABLE_PHOTO', 'statics/photo_not_available.jpg');
 define('LOGIN_DATA_EXPIRE_SECONDS', 60);
 // JWT Token Secret Key
 define('JWT_TOKEN_SECRET_KEY', 'undercity');
+// Private Key
+define('RSA_SECRET_KEY', 'certs/private.pem');
+// Symmetric Crypto Algorithm
+define('SYM_CRYPTO_ALGORITHM', 'aes-256-cbc');

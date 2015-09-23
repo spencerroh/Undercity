@@ -5,8 +5,11 @@
  */
 
 
-
 $app->group('/test', function () use ($app) {
+    $app->post('/enc', function () use ($app) {
+        $app->auth->loginFromEncryptedData($app->request->getBody(), $loginData);
+        echo $loginData;
+    });
     $app->get('/addTestShop', function () use ($app) {
         $baseX = 37.264;
         $baseY = 127.020;
