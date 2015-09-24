@@ -11,6 +11,7 @@ date_default_timezone_set('asia/seoul');
 
 $app = new \Slim\Slim();
 $app->auth = new \Undercity\AuthenticationService();
+$app->GCM = new \Undercity\GCMPushNotification(SERVER_GCM_KEY);
 $app->add(new \Undercity\AuthenticationMiddleware());
 
 // 주의: imageOps 배열은 ACCEPTABLE_IMAGE_FORMAT 에 정의된 이미지 포맷을 읽고, 저장하는

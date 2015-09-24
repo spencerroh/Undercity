@@ -6,10 +6,9 @@
 
 
 $app->group('/test', function () use ($app) {
-    $app->post('/enc', function () use ($app) {
-        $data = json_decode($app->request->getBody(), true);
-        $app->auth->loginFromEncryptedData($data, $loginData);
-        echo $loginData;
+    $app->get('/gcm', function () use ($app) {
+        $app->GCM->setDevices('APA91bHxhzlBESt1STUj5pR1qqa-1c5gq_ybbZ7ebgwTn4Q7_yCrAicLDtRWFP86EAOR6CmK7dVDzMCjwVHRzBCY0Nf_0kFl2vY_FsM4WyJjE1DtYiLINepHpBymGHPRbt6bgEoqYcr13knWbaAmIsRrP1QdNI6IIg');
+        $app->GCM->send('Hello');
     });
     $app->get('/addTestShop', function () use ($app) {
         $baseX = 37.264;
