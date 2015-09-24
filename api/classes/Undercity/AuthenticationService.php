@@ -5,6 +5,7 @@ namespace Undercity;
 use \DateTime;
 use \Undercity\UserQuery as UserQuery;
 use \Undercity\User as User;
+use \Firebase\JWT\JWT;
 
 class AuthenticationService
 {
@@ -52,23 +53,64 @@ class AuthenticationService
         return $user;
     }
     
+    public function loginFromEncryptedDataV1($encryptedLoginData, &$loginData)
+    {
+        if (array_key_exists('Login', $encryptedLoginData)) {
+            $privateKey = openssl_get_privatekey(file_get_contents(RSA_SECRET_KEY));
+            $encryptedData = base64_decode($encryptedLoginData['Login']);
+        
+            if (openssl_private_decrypt($encryptedData, 
+                                        $decryptedData, 
+                                        $privateKey, 
+                                        OPENSSL_PKCS1_PADDING)) {
+
+                $loginData = $decryptedData;
+                return true;
+            }
+            return false;
+        }
+    }
+    
     public function loginFromEncryptedData($encryptedLoginData, &$loginData)
     {
-        $data = json_decode($encryptedLoginData, true);
-        if (array_key_exists('key', $data) &&
-            array_key_exists('data', $data)) {
+        if (array_key_exists('key', $encryptedLoginData) &&
+            array_key_exists('data', $encryptedLoginData)) {
             $privateKey = openssl_get_privatekey(file_get_contents(RSA_SECRET_KEY));
-            $encryptedKey = base64_decode($data['key']);
-            $encryptedData = $data['data'];
-                    
+            $encryptedKey = base64_decode($encryptedLoginData['key']);
+            $encryptedData = $encryptedLoginData['data'];
+
             if (openssl_private_decrypt($encryptedKey, 
                                         $decryptedKey, 
                                         $privateKey, 
                                         OPENSSL_PKCS1_PADDING)) {
                 $loginData = $this->cryptoJsAesDecrypt($decryptedKey, $encryptedData);
+                return true;
             }
         }
         return false;
+    }
+    
+    public function createToken($loginData, $userId, &$token)
+    {
+        $timeElapsed = (new DateTime('now'))->getTimestamp() - $loginData['Now'];
+        
+        if ($timeElapsed > LOGIN_DATA_EXPIRE_SECONDS)
+            return false;
+        
+        $iat = (new DateTime('now'))->getTimestamp();
+        $exp = $iat + JWT_TOKEN_EXPIRE_SECONDS;
+        
+        $token = array (
+            'usr'=> $userId,
+            'iat'=> $iat,
+            'exp'=> $exp,
+            'context' => array(
+                'user' => $userId
+            )
+        );
+        
+        $token = JWT::encode($token, JWT_TOKEN_SECRET_KEY);
+        return true;
     }
 
     public function getUser()

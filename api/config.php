@@ -16,6 +16,8 @@ define('ACCEPTABLE_IMAGE_FORMAT', 'image/png;image/jpeg;');
 define('NOT_AVAILABLE_PHOTO', 'statics/photo_not_available.jpg');
 // 수신된 로그인 데이터의 만료시간
 define('LOGIN_DATA_EXPIRE_SECONDS', 60);
+// 토큰 만료 시간
+define('JWT_TOKEN_EXPIRE_SECONDS', 3600);
 // JWT Token Secret Key
 define('JWT_TOKEN_SECRET_KEY', 'undercity');
 // Private Key

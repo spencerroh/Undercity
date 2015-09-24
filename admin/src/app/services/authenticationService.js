@@ -50,10 +50,7 @@ angular.module('undercity')
             var encrypt = new JSEncrypt();
             encrypt.setPublicKey(publicKey);
             var encryptedKey = encrypt.encrypt(passphase);
-            
-            console.log(passphase);
-            console.log(encryptedKey);
-            
+                    
             return {
                 key: encryptedKey,
                 data: encryptedData

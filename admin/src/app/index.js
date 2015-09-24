@@ -50,7 +50,4 @@ angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 
             });
 
         $urlRouterProvider.otherwise('/');
-    })
-    .run(function () {
-
     });

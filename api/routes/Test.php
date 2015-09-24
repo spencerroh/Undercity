@@ -7,7 +7,8 @@
 
 $app->group('/test', function () use ($app) {
     $app->post('/enc', function () use ($app) {
-        $app->auth->loginFromEncryptedData($app->request->getBody(), $loginData);
+        $data = json_decode($app->request->getBody(), true);
+        $app->auth->loginFromEncryptedData($data, $loginData);
         echo $loginData;
     });
     $app->get('/addTestShop', function () use ($app) {
