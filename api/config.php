@@ -25,4 +25,4 @@ define('RSA_SECRET_KEY', 'certs/private.pem');
 // Symmetric Crypto Algorithm
 define('SYM_CRYPTO_ALGORITHM', 'aes-256-cbc');
 // GCM Server Key
-define('SERVER_GCM_KEY', 'AIzaSyC0edZo_dleJI-BiCya-eM-e24scdWveR0');
+define('SERVER_GCM_KEY', 'AIzaSyAhmO7JOx2TMefe4PNdo7DUqRxP3Mz7c4w');
