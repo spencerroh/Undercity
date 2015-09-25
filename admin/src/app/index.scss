@@ -24,6 +24,12 @@
   }
 }
 
+.adminInputForm:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
 .section {
   margin: 15px;
   padding: 30px 5px 5px;

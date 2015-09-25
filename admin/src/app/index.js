@@ -47,6 +47,11 @@ angular.module('undercity', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 
                 url: 'products',
                 templateUrl: 'app/products/products.html',
                 controller: 'ProductCtrl'
+            })
+            .state('home.demo', {
+                url: 'demo',
+                templateUrl: 'app/demo/demo.html',
+                controller: 'DemoCtrl'
             });
 
         $urlRouterProvider.otherwise('/');
