@@ -23,7 +23,6 @@ $app->group('/test', function () use ($app) {
             $store->setName('관리자');
             $store->setAddress('주소');
             $store->setContact(rand(0, 10000000));
-            $store->setProduct('품목');
             $store->setDescription('설명');
             $store->setLatitude($baseX + $baseDelta * $ratioX);
             $store->setLongitude($baseY + $baseDelta * $ratioY);
@@ -35,8 +34,8 @@ $app->group('/test', function () use ($app) {
         $users = \Undercity\UserQuery::create()->find();
         $sale = \Undercity\SaleQuery::create()->findPK($sale);
         foreach ($users as $user) {
-            //$app->GCM->setDevices($user->getDeviceToken());
-            $app->GCM->setDevices('APA91bHvoQNsX4NEr9gR-lzQhND1TemQLh04aiIboWI3Nws8OQwZpZGPQQtwGb9a61PhyQi7E1UqeuuBECVnA-og2XayP-EW8BybcAs3IpIsSVk_5EbA1lzvv89ThK1dqqwpKv7LeeXdgttujtJgD-dXdG_qo0w3Mg');
+            $app->GCM->setDevices($user->getDeviceToken());
+            //$app->GCM->setDevices('APA91bHvoQNsX4NEr9gR-lzQhND1TemQLh04aiIboWI3Nws8OQwZpZGPQQtwGb9a61PhyQi7E1UqeuuBECVnA-og2XayP-EW8BybcAs3IpIsSVk_5EbA1lzvv89ThK1dqqwpKv7LeeXdgttujtJgD-dXdG_qo0w3Mg');
             $app->GCM->send('생생정보시장', $sale->getTitle(), $sale->toArray());
         }
     });
