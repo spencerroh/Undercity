@@ -27,6 +27,15 @@ $app->group('/bookmark', function () use ($app) {
         echo json_encode($response, true);
     });
 
+    $app->get('/shop/:id', function ($id) use ($app) {
+        $isExists = \Undercity\ShopBookmarkQuery::create()->filterByUser($app->user)
+                                                          ->filterByShopId($id)
+                                                          ->exists();
+        echo json_encode(array(
+            'result' => $isExists
+        ));
+    });
+
     $app->post('/shop/:id', function ($id) use ($app) {
         $shop = \Undercity\StoreQuery::create()->findPk($id);
 
@@ -56,6 +65,15 @@ $app->group('/bookmark', function () use ($app) {
         } else {
             $app->response->setStatus(404);
         }
+    });
+
+    $app->get('/sale/:id', function ($id) use ($app) {
+        $isExists = \Undercity\SaleBookmarkQuery::create()->filterByUser($app->user)
+                                                          ->filterBySaleId($id)
+                                                          ->exists();
+        echo json_encode(array(
+            'result' => $isExists
+        ));
     });
 
     $app->post('/sale/:id', function ($id) use ($app) {
