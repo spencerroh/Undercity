@@ -21,6 +21,19 @@ class AuthenticationMiddleware extends Middleware
         $isOptionsRequest = $app->request->isOptions();
 
         $hasToken = $app->request->headers->has('X-Token');
+
+        if ($hasToken) {
+            try {
+                $decoded = JWT::decode($app->request->headers->get('X-Token'), JWT_TOKEN_SECRET_KEY, array('HS256'));
+
+                $userId = $decoded->context->user;
+                $app->user = \Undercity\UserQuery::create()->findPk($userId);
+            } catch(ExpiredException $e) {
+                echo $e->getMessage();
+                $app->response->setStatus(401);
+            }
+        }
+
         if ($isLoginRequest || !$hasToken) {
             if ($isOptionsRequest) {
                 $app->response->header('Allow', 'OPTIONS, GET, POST, DELETE');
@@ -31,20 +44,7 @@ class AuthenticationMiddleware extends Middleware
                 $app->response->setStatus(401);
             }
         } else {
-            $token = $app->request->headers->get('X-Token');
-
-            try {
-                $decoded = JWT::decode($token, JWT_TOKEN_SECRET_KEY, array('HS256'));
-
-                $userId = $decoded->context->user;
-                $app->user = \Undercity\UserQuery::create()->findPk($userId);
-
-                $this->next->call();
-            } catch(ExpiredException $e) {
-                echo $e->getMessage();
-                $app->response->setStatus(401);
-            }
-
+            $this->next->call();
         }
     }
 }

@@ -3,8 +3,6 @@
 namespace Undercity;
 
 use \DateTime;
-use \Undercity\UserQuery as UserQuery;
-use \Undercity\User as User;
 use \Firebase\JWT\JWT;
 
 class AuthenticationService
@@ -29,21 +27,18 @@ class AuthenticationService
         return $data;
     }
 
-    public function logIn($deviceUUID, $deviceToken, $deviceOS)
+    public function logIn($deviceUUID, $deviceOS)
     {
         $user = \Undercity\UserQuery::create()->findOneBydeviceUUID($deviceUUID);
 
         if ($user == null) {
             $user = new User();
             $user->setDeviceUUID($deviceUUID);
-            $user->setDeviceToken($deviceToken);
             $user->setdeviceOS($deviceOS);
             $user->setCreateDate(new DateTime('now'));
         }
 
-        if ($deviceToken !== $user->getDeviceToken() ||
-            $deviceOS !== $user->getdeviceOS()) {
-            $user->setDeviceToken($deviceToken);
+        if ($deviceOS !== $user->getdeviceOS()) {
             $user->setdeviceOS($deviceOS);
         }
 
@@ -69,6 +64,7 @@ class AuthenticationService
             }
             return false;
         }
+        return false;
     }
     
     public function loginFromEncryptedData($encryptedLoginData, &$loginData)
