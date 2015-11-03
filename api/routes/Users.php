@@ -14,18 +14,19 @@ $app->group('/user', function () use ($app) {
 
     $app->map('/', function () use ($app) {
         $request = json_decode($app->request->getBody(), true);
+
+        $loginData = null;
         if ($app->auth->loginFromEncryptedData($request, $loginData) ||
             $app->auth->loginFromEncryptedDataV1($request, $loginData)) {
             $loginData = json_decode($loginData, true);
             
             if (array_key_exists('DeviceUUID', $loginData) &&
-                array_key_exists('DeviceToken', $loginData) &&
                 array_key_exists('DeviceOS', $loginData) &&
                 array_key_exists('Now', $loginData)) {
                 $app->user = $app->auth->logIn($loginData['DeviceUUID'],
-                                               $loginData['DeviceToken'],
                                                $loginData['DeviceOS']);
-                
+
+                $token = null;
                 if ($app->auth->createToken($loginData, $app->user->getId(), $token)) {
                     echo json_encode(array(
                         'token' => $token
@@ -58,6 +59,22 @@ $app->group('/user', function () use ($app) {
     $app->map('/', function () use ($app) {
         $app->auth->logOut();
     })->via('DELETE');
+
+    $app->put('/', function () use ($app) {
+        $request = json_decode($app->request->getBody(), true);
+        if (array_key_exists('Token', $request)) {
+            if ($app->user) {
+                $app->user->setDeviceToken($request['Token']);
+                $app->user->save();
+            } else {
+                echo 'not logged in';
+                $app->response->setStatus(401);
+            }
+        } else {
+            echo 'not enough data';
+            $app->response->setStatus(400);
+        }
+    });
 });
 
 ?>
