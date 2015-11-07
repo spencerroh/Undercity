@@ -39,4 +39,41 @@ $app->group('/test', function () use ($app) {
             $app->GCM->send('생생정보시장', $sale->getTitle(), $sale->toArray());
         }
     });
+
+    $app->get('/images', function () use ($app) {
+        $images = \Undercity\ImageQuery::create()->find();
+
+        $imageFiles = array();
+        foreach ($images as $image) {
+            array_push($imageFiles, $image->getSource());
+            if ($image->getSource() != $image->getSourceThumb()) {
+                array_push($imageFiles, $image->getSourceThumb());
+            }
+        }
+
+        $zip = new ZipArchive();
+        $filename = 'temp/'.uniqid('zip').'.zip';
+        $zip->open($filename, ZipArchive::CREATE);
+        foreach ($imageFiles as $file) {
+            $zip->addFile(RESOURCE_PATH . $file);
+        }
+        $zip->close();
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $filename);
+        $size = filesize($filename);
+        $name = basename($filename);
+
+        header('Cache-Control: private, max-age=120, must-revalidate');
+        header("Pragma: no-cache");
+        header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // long ago
+        header("Content-Type: $mimeType");
+        header('Content-Disposition: attachment; filename="' . $name . '";');
+        header("Accept-Ranges: bytes");
+        header('Content-Length: ' . filesize($filename));
+
+        print readfile($filename);
+
+        unlink($filename);
+    });
 });
