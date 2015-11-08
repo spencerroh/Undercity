@@ -4,6 +4,7 @@
  * Date: 2015-08-26
  */
 
+use Propel\Runtime\Formatter\ObjectFormatter;
 
 $app->group('/test', function () use ($app) {
     $app->get('/gcm', function () use ($app) {
@@ -75,5 +76,43 @@ $app->group('/test', function () use ($app) {
         print readfile($filename);
 
         unlink($filename);
+    });
+
+    $app->get('/location', function () use ($app){
+        $location = array('latitude' => 37.5555, 'longitude' => 127.55555);
+        $user = \Undercity\UserQuery::create()->findPk(5);
+
+        $con = \Propel\Runtime\Propel::getWriteConnection(\Undercity\Map\SaleTableMap::DATABASE_NAME);
+
+        $sql = <<<SQL
+          SELECT sales.*
+          FROM sales
+            LEFT JOIN (
+              SELECT *
+              FROM location_event_log
+              WHERE user_id = :userId) as Sent
+            ON sales.id = Sent.sale_id
+          WHERE Sent.id is null and DISTANCE(latitude, longitude, :latitude, :longitude, 'km') < 200
+SQL;
+        $stmt = $con->prepare($sql);
+        $stmt->execute(array(
+            ':latitude' => $location['latitude'],
+            ':longitude' => $location['longitude'],
+            ':userId' => $user->getId()
+        ));
+
+        $formatter = new ObjectFormatter();
+        $formatter->setClass('\Undercity\Sale');
+        $sales = $formatter->format($con->getDataFetcher($stmt));
+
+        $app->GCM->setDevices($user->getDeviceToken());
+        foreach ($sales as $sale) {
+            $app->GCM->send('생생정보시장', $sale->getTitle(), $sale->toArray());
+
+            $log = new \Undercity\LocationEventLog();
+            $log->setUser($user);
+            $log->setSaleId($sale->getId());
+            $log->save();
+        }
     });
 });

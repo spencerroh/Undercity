@@ -189,7 +189,7 @@
         </foreign-key>
     </table>
 
-    <table  name="shop_bookmarks" phpName="ShopBookmark">
+    <table name="shop_bookmarks" phpName="ShopBookmark">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
         <column name="shop_id" type="integer" required="true"/>
@@ -201,7 +201,7 @@
         </foreign-key>
     </table>
 
-    <table  name="sale_bookmarks" phpName="SaleBookmark">
+    <table name="sale_bookmarks" phpName="SaleBookmark">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="user_id" type="integer" required="true"/>
         <column name="sale_id" type="integer" required="true"/>
@@ -209,6 +209,18 @@
             <reference local="user_id" foreign="id" />
         </foreign-key>
         <foreign-key foreignTable="sales" phpName="Sale" refPhpName="SaleBookmark">
+            <reference local="sale_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <table name="location_event_log" phpName="LocationEventLog">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true"/>
+        <column name="sale_id" type="integer" required="true"/>
+        <foreign-key foreignTable="users" phpName="User" refPhpName="LocationEventLog">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="sales" phpName="Sale" refPhpName="LocationEventLog">
             <reference local="sale_id" foreign="id" />
         </foreign-key>
     </table>
