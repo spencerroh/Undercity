@@ -59,13 +59,13 @@ class GCMPushNotification {
         // Close connection
         curl_close($ch);
 
-        echo '|'.$result.'|';
+        //echo '|'.$result.'|';
         return $result;
     }
 
     function error($msg){
-        echo "Android send notification failed with error:";
-        echo "\t" . $msg;
-        exit(1);
+        //echo "Android send notification failed with error:";
+        //echo "\t" . $msg;
+        //exit(1);
     }
 }
