@@ -22,7 +22,10 @@ $app->group('/location', function () use ($app) {
               FROM location_event_log
               WHERE user_id = :userId) as Sent
             ON sales.id = Sent.sale_id
-          WHERE Sent.id is null and DISTANCE(latitude, longitude, :latitude, :longitude, 'km') < 200
+          WHERE Sent.id is null
+            and sales.event_from <= curdate()
+            and sales.event_to >= curdate()
+            and DISTANCE(latitude, longitude, :latitude, :longitude, 'km') < 2
 SQL;
         $stmt = $con->prepare($sql);
         $stmt->execute(array(
