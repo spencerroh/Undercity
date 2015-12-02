@@ -92,6 +92,9 @@ $app->group('/intro', function () use ($app) {
 
         if ($intro != null) {
             $intro->getIntroShopImages()->delete();
+            foreach ($intro->getIntroShopImages() as $image) {
+                $image->getImage()->delete();
+            }
             $intro->getIntroShopReplies()->delete();
             $intro->delete();
         }

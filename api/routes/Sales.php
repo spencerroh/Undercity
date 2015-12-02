@@ -178,13 +178,12 @@ $app->group('/sales', function () use ($app) {
     });
 
     $app->delete('/:id', function ($id) use ($app) {
-        $sale = \Undercity\SaleQuery::create()
-            ->findPk($id);
+        $sale = \Undercity\SaleQuery::create()->findPk($id);
 
         if ($sale != null) {
-            $saleImages = \Undercity\SaleImagesQuery::create()->findBySaleId($sale->getId());
-            foreach ($saleImages as $saleImage) {
-                $saleImage->delete();
+            $sale->getSaleImages()->delete();
+            foreach ($sale->getSaleImages() as $saleImage) {
+                $saleImage->getImage()->delete();
             }
             $sale->delete();
         } else {
@@ -208,6 +207,9 @@ $app->group('/sales', function () use ($app) {
         $saleImage = \Undercity\SaleImagesQuery::create()->findOneByImageId($id);
         if ($saleImage != null) {
             $saleImage->delete();
+            foreach ($saleImage->getSaleImages() as $image) {
+                $image->getImage()->delete();
+            }
         } else {
             $app->response->setStatus(404);
         }

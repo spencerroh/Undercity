@@ -103,6 +103,9 @@ $app->group('/deal', function () use ($app) {
 
         if ($item != null) {
             $item->getLightningDealImages()->delete();
+            foreach ($item->getLightningDealImages() as $image) {
+                $image->getImage()->delete();
+            }
             $item->getLightningDealReplies()->delete();
             $item->delete();
         }

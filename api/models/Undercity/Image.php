@@ -3,7 +3,7 @@
 namespace Undercity;
 
 use Undercity\Base\Image as BaseImage;
-
+use Propel\Runtime\Connection\ConnectionInterface;
 /**
  * Skeleton subclass for representing a row from the 'images' table.
  *
@@ -24,5 +24,10 @@ class Image extends BaseImage
         if (file_exists(RESOURCE_PATH . parent::getSourceThumb())) {
             unlink(RESOURCE_PATH . parent::getSourceThumb());
         }
+    }
+    
+    public function delete(ConnectionInterface $con = null) {
+        $this->removeResources();
+        parent::delete($con);
     }
 }
