@@ -3,7 +3,7 @@
  */
 
 angular.module('undercity')
-    .controller('LightningDealCtrl', function ($scope, $q, imageService, IMAGE_ENDPOINT, lightningDealService, lightningDealReplyService) {
+    .controller('LightningDealCtrl', function ($scope, $q, imageService, IMAGE_ENDPOINT, lightningDealService, lightningDealReplyService, lightningDealImageService) {
         'use strict';
 
         var service = lightningDealService;
@@ -18,7 +18,8 @@ angular.module('undercity')
 
         function refreshItems() {
             service.readAll({
-                id: -1, count: -1
+                id: -1,
+                count: -1
             }, function (data) {
                 $scope.items = data;
             });
@@ -105,4 +106,19 @@ angular.module('undercity')
         $scope.clearReply = function () {
             $scope.reply = {};
         };
+
+        $scope.deleteImage = function ($pid, $iid) {
+            lightningDealImageService.delete({
+                pid: $pid,
+                iid: $iid
+            });
+        };
+        /*
+        $scope.addImage = function ($pid, $iid) {
+            console.log($pid, $iid);
+            lightningDealImageService.add({
+                pid: $pid,
+                iid: $iid
+            });
+        };*/
     });

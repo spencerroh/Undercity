@@ -1,6 +1,6 @@
 angular.module('undercity')
 
-    .factory('introShopService', ['$resource', 'SERVICE_ENDPOINT', function ($resource, SERVICE_ENDPOINT) {
+.factory('introShopService', ['$resource', 'SERVICE_ENDPOINT', function ($resource, SERVICE_ENDPOINT) {
         'use strict';
         return $resource(SERVICE_ENDPOINT + '/intro/:id/:count', {}, {
             create: {
@@ -14,6 +14,17 @@ angular.module('undercity')
                 method: 'GET'
             },
             modify: {
+                method: 'POST'
+            },
+            delete: {
+                method: 'DELETE'
+            }
+        });
+    }])
+    .factory('introShopImageService', ['$resource', 'SERVICE_ENDPOINT', function ($resource, SERVICE_ENDPOINT) {
+        'use strict';
+        return $resource(SERVICE_ENDPOINT + '/intro/image/:pid/:iid', {}, {
+            add: {
                 method: 'POST'
             },
             delete: {

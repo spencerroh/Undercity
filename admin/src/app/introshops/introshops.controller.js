@@ -1,7 +1,7 @@
 /*jslint browser: true*/
 /*global angular*/
 angular.module('undercity')
-    .controller('IntroShopsCtrl', function ($scope, $q, imageService, introShopService, introShopReplyService, IMAGE_ENDPOINT) {
+    .controller('IntroShopsCtrl', function ($scope, $q, imageService, introShopService, introShopReplyService, IMAGE_ENDPOINT, introShopImageService) {
         'use strict';
         $scope.intro = {};
         $scope.reply = {};
@@ -9,7 +9,8 @@ angular.module('undercity')
 
         function refreshIntroShop() {
             introShopService.readAll({
-                id: -1, count: -1
+                id: -1,
+                count: -1
             }, function (data) {
                 $scope.introShops = data;
             });
@@ -94,5 +95,12 @@ angular.module('undercity')
 
         $scope.clearReply = function () {
             $scope.reply = {};
+        };
+
+        $scope.deleteImage = function ($pid, $iid) {
+            introShopImageService.delete({
+                pid: $pid,
+                iid: $iid
+            });
         };
     });

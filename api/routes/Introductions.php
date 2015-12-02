@@ -3,9 +3,13 @@
  * User: spencer.roh@gmail.com
  * Date: 2015-08-10
  */
+
+use \Undercity\IntroShop as Item;
 use \Undercity\IntroShopQuery as ItemQuery;
 use \Undercity\IntroShopReply as Reply;
 use \Undercity\IntroShopReplyQuery as ReplyQuery;
+use \Undercity\IntroShopImage as Image;
+use \Undercity\IntroShopImageQuery as ImageQuery;
 
 $app->group('/intro', function () use ($app) {
     $app->post('/', function () use ($app) {
@@ -14,7 +18,7 @@ $app->group('/intro', function () use ($app) {
         if (array_key_exists('Description', $request) &&
             array_key_exists('Title', $request) &&
             array_key_exists('NickName', $request)) {
-            $intro = new \Undercity\IntroShop();
+            $intro = new Item();
             $intro->setDescription($request['Description']);
             $intro->setTitle($request['Title']);
             $intro->setNickName($request['NickName']);
@@ -24,7 +28,7 @@ $app->group('/intro', function () use ($app) {
 
             if (array_key_exists('Images', $request)) {
                 foreach ($request['Images'] as $image) {
-                    $introImage = new \Undercity\IntroShopImage();
+                    $introImage = new Image();
                     $introImage->setImageId($image);
 
                     $intro->addIntroShopImage($introImage);
@@ -38,18 +42,18 @@ $app->group('/intro', function () use ($app) {
         $lastIntroShop = null;
 
         if ($from == -1) {
-            $lastIntroShop = \Undercity\IntroShopQuery::create()
+            $lastIntroShop = ItemQuery::create()
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
                 ->findOne();
         } else {
-            $lastIntroShop = \Undercity\IntroShopQuery::create()
+            $lastIntroShop = ItemQuery::create()
                 ->filterById(array('max' => $from))
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
                 ->findOne();
         }
 
         if ($lastIntroShop != null) {
-            $query = \Undercity\IntroShopQuery::create()
+            $query = ItemQuery::create()
                 ->filterById(array('max' => $lastIntroShop->getId()))
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC);
             if ($count != -1) {
@@ -65,7 +69,7 @@ $app->group('/intro', function () use ($app) {
     });
 
     $app->get('/:id', function ($id) use ($app) {
-        $intro = \Undercity\IntroShopQuery::create()->findPk($id);
+        $intro = ItemQuery::create()->findPk($id);
 
         if ($intro != null) {
             echo json_encode($intro->toArray(), true);
@@ -75,7 +79,7 @@ $app->group('/intro', function () use ($app) {
     $app->put('/:id', function ($id) use ($app) {
         $request = json_decode($app->request->getBody(), true);
 
-        $intro = \Undercity\IntroShopQuery::create()->findOneById($id);
+        $intro = ItemQuery::create()->findOneById($id);
         if (array_key_exists('Description', $request)) {
             $intro->setDescription($request['Description']);
         }
@@ -88,7 +92,7 @@ $app->group('/intro', function () use ($app) {
     });
 
     $app->delete('/:id', function ($id) use ($app) {
-        $intro = \Undercity\IntroShopQuery::create()->findPk($id);
+        $intro = ItemQuery::create()->findPk($id);
 
         if ($intro != null) {
             $intro->getIntroShopImages()->delete();
@@ -163,19 +167,26 @@ $app->group('/intro', function () use ($app) {
         }
     });
 
-    $app->get('/:id:/images/', function ($id) use ($app) {
-
+    $app->post('/image/:pid/:iid', function ($pid, $iid) use ($app) {
+        $item = ItemQuery::create()->findPk($pid);
+        var_dump($item);
+        if ($item) {
+            $image = new Image();
+            $image->setImageId($iid);
+            $item->addIntroShopImage($image);
+            $item->save();
+        } else {
+            $app->response->setStatus(404);
+        }
     });
 
-    $app->post('/:id:/images/', function ($id) use ($app) {
-
-    });
-
-    $app->put('/:id:/images/:iid', function ($id, $iid) use ($app) {
-
-    });
-
-    $app->delete('/:id:/images/:iid', function ($id, $iid) use ($app) {
-
+    $app->delete('/image/:pid/:iid', function ($pid, $iid) use ($app) {
+        $image = ImageQuery::create()->filterByPostId($pid)->filterByImageId($iid)->findOne();
+        if ($image) {
+            $image->delete();
+            $image->getImage()->delete();
+        } else {
+            $app->response->setStatus(404);
+        }
     });
 });

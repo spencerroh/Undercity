@@ -4,9 +4,12 @@
  * Date: 2015-08-12
  */
 
+use \Undercity\LightningDeal as Item;
 use \Undercity\LightningDealQuery as ItemQuery;
 use \Undercity\LightningDealReply as Reply;
 use \Undercity\LightningDealReplyQuery as ReplyQuery;
+use \Undercity\LightningDealImage as Image;
+use \Undercity\LightningDealImageQuery as ImageQuery;
 
 $app->group('/deal', function () use ($app) {
     $app->post('/', function () use ($app) {
@@ -16,7 +19,7 @@ $app->group('/deal', function () use ($app) {
             array_key_exists('Title', $request) &&
             array_key_exists('NickName', $request) &&
             array_key_exists('EndDate', $request)) {
-            $lightningDeal = new \Undercity\LightningDeal();
+            $lightningDeal = new Item();
             $lightningDeal->setDescription($request['Description']);
             $lightningDeal->setTitle($request['Title']);
             $lightningDeal->setNickName($request['NickName']);
@@ -27,7 +30,7 @@ $app->group('/deal', function () use ($app) {
 
             if (array_key_exists('Images', $request)) {
                 foreach ($request['Images'] as $image) {
-                    $lightningDealImage = new \Undercity\LightningDealImage();
+                    $lightningDealImage = new Image();
                     $lightningDealImage->setImageId($image);
 
                     $lightningDeal->addLightningDealImage($lightningDealImage);
@@ -41,18 +44,18 @@ $app->group('/deal', function () use ($app) {
         $lastItem = null;
 
         if ($from == -1) {
-            $lastItem = \Undercity\LightningDealQuery::create()
+            $lastItem = ItemQuery::create()
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
                 ->findOne();
         } else {
-            $lastItem = \Undercity\LightningDealQuery::create()
+            $lastItem = ItemQuery::create()
                 ->filterById(array('max' => $from))
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)
                 ->findOne();
         }
 
         if ($lastItem != null) {
-            $query = \Undercity\LightningDealQuery::create()
+            $query = ItemQuery::create()
                 ->filterById(array('max' => $lastItem->getId()))
                 ->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC);
             if ($count != -1) {
@@ -68,7 +71,7 @@ $app->group('/deal', function () use ($app) {
     });
 
     $app->get('/:id', function ($id) use ($app) {
-        $item = \Undercity\LightningDealQuery::create()->findPk($id);
+        $item = ItemQuery::create()->findPk($id);
 
         if ($item != null) {
             echo json_encode($item->toArray(), true);
@@ -78,7 +81,7 @@ $app->group('/deal', function () use ($app) {
     $app->put('/:id', function ($id) use ($app) {
         $request = json_decode($app->request->getBody(), true);
 
-        $item = \Undercity\LightningDealQuery::create()->findOneById($id);
+        $item = ItemQuery::create()->findOneById($id);
         if (array_key_exists('Description', $request)) {
             $item->setDescription($request['Description']);
         }
@@ -99,7 +102,7 @@ $app->group('/deal', function () use ($app) {
     });
 
     $app->delete('/:id', function ($id) use ($app) {
-        $item = \Undercity\LightningDealQuery::create()->findPk($id);
+        $item = ItemQuery::create()->findPk($id);
 
         if ($item != null) {
             $item->getLightningDealImages()->delete();
@@ -169,6 +172,28 @@ $app->group('/deal', function () use ($app) {
         if ($reply) {
             $reply->setIsRemoved(true);
             $reply->save();
+        } else {
+            $app->response->setStatus(404);
+        }
+    });
+    
+    $app->get('/image/:pid/:iid', function ($pid, $iid) use ($app) {
+        $item = ItemQuery::create()->findPk($pid);
+        if ($item) {
+            $image = new Image();
+            $image->setImageId($iid);
+            $item->addLightningDealImage($image);
+            $item->save();
+        } else {
+            $app->response->setStatus(404);
+        }
+    });
+
+    $app->delete('/image/:pid/:iid', function ($pid, $iid) use ($app) {
+        $image = ImageQuery::create()->filterByPostId($pid)->filterByImageId($iid)->findOne();
+        if ($image) {
+            $image->delete();
+            $image->getImage()->delete();
         } else {
             $app->response->setStatus(404);
         }

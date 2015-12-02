@@ -23,7 +23,7 @@
                 <input id="introImages" type="file" class="form-control" ngf-select ng-model="$parent.itemImages" ngf-multiple="true">
                 <ul class="imagePreview">
                     <li ng-repeat="image in itemImages">
-                        <img ngf-src="image"/>
+                        <img ngf-src="image" />
                     </li>
                 </ul>
             </div>
@@ -94,7 +94,7 @@
                     <td colspan="9">
                         <ul class="imagePreview">
                             <li ng-repeat="image in item.Images">
-                                <img ng-src="{{getImageURL(image)}}"/>
+                                <img ng-src="{{getImageURL(image)}}" ng-click="deleteImage(item.Id, image)" />
                             </li>
                         </ul>
                     </td>
