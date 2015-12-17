@@ -99,6 +99,9 @@ $app->group('/deal', function () use ($app) {
         }
 
         $item->setLastUpdateDate(new DateTime('now'));
+        $item->save();
+
+        echo json_encode($item->toArray(), true);
     });
 
     $app->delete('/:id', function ($id) use ($app) {

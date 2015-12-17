@@ -89,6 +89,9 @@ $app->group('/intro', function () use ($app) {
         }
 
         $intro->setLastUpdateDate(new DateTime('now'));
+        $intro->save();
+
+        echo json_encode($intro->toArray(), true);
     });
 
     $app->delete('/:id', function ($id) use ($app) {
