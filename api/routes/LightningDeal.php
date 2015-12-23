@@ -95,7 +95,7 @@ $app->group('/deal', function () use ($app) {
         }
 
         if (array_key_exists('EndDate', $request)) {
-            $item->setNickName($request['EndDate']);
+            $item->setEndDate($request['EndDate']);
         }
 
         $item->setLastUpdateDate(new DateTime('now'));
