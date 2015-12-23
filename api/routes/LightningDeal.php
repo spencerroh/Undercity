@@ -101,6 +101,7 @@ $app->group('/deal', function () use ($app) {
         $item->setLastUpdateDate(new DateTime('now'));
         $item->save();
 
+        $item = ItemQuery::create()->findPk($id);
         echo json_encode($item->toArray(), true);
     });
 
